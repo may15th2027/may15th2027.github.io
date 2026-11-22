@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chin-Yi &amp; Sixuan</title>
+  <meta name="description" content="Chin-Yi & Sixuan — Our Wedding Adventure. May 15, 2027 · Duke Chapel, Durham, NC." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'><path fill='%23e5484d' d='M2 3h4v1h1v1h2V4h1V3h4v1h1v5h-1v1h-1v1h-1v1h-1v1h-1v1H8v1H7v-1H6v-1H5v-1H4v-1H3v-1H2V9H1V4h1z'/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============ PRESS START overlay ============ -->
+  <div id="boot" class="boot" role="dialog" aria-label="Start">
+    <div class="boot-inner">
+      <div class="boot-heart">♥</div>
+      <h1 class="boot-title">Chin-Yi &amp; Sixuan</h1>
+      <p class="boot-sub">Our Wedding Adventure</p>
+      <button id="startBtn" class="btn btn-pink blink-soft">▶ PRESS START</button>
+      <p class="boot-hint">or press any key</p>
+    </div>
+  </div>
+
+  <!-- ============ HUD (top-right) ============ -->
+  <div class="hud">
+    <button id="soundBtn" class="hud-btn" aria-label="Toggle sound" title="Sound">♪ ON</button>
+  </div>
+
+  <!-- ============ TOP NAV (sub-screens) ============ -->
+  <nav class="topnav" id="topnav" aria-label="Main">
+    <a href="#home"  data-go="home"><span class="ico">🏠</span>Home</a>
+    <a href="#story" data-go="story"><span class="ico">❤</span>Our Story</a>
+    <a href="#wedding" data-go="wedding"><span class="ico">💍</span>Wedding</a>
+    <a href="#travel" data-go="travel"><span class="ico">🗺</span>Travel</a>
+    <a href="#rsvp"  data-go="rsvp"><span class="ico">✉</span>RSVP</a>
+  </nav>
+
+  <main>
+    <!-- ================= HOME / TITLE SCREEN ================= -->
+    <section id="screen-home" class="screen screen-home" data-screen="home">
+      <div class="hero-wrap">
+        <div class="hero">
+          <!-- artwork + hidden extras -->
+          <div class="hero-art">
+            <img src="assets/background.png" class="hero-img" alt="Pixel art: Chin-Yi and Sixuan sitting on a log with their cat, looking toward Duke Chapel at sunset, under a sign reading Chin-Yi &amp; Sixuan, Our Wedding Adventure, We&rsquo;re Getting Married!" />
+            <div class="petals" aria-hidden="true"></div>
+            <button class="hot" id="catBtn" style="--l:55.2%;--t:70%;--w:3.8%;--h:9.5%;--ml:56.9%;--mw:4.8%" aria-label="Pet the cat"></button>
+            <a class="hot hot-mailbox" href="#rsvp" data-go="rsvp" style="--l:89.8%;--t:74.4%;--w:9%;--h:11.7%" aria-label="Mailbox: RSVP"></a>
+            <div class="speech" id="catSpeech" aria-live="polite">Meow! Did you RSVP yet? 🐾</div>
+          </div>
+
+          <!-- left signpost menu -->
+          <nav class="signpost" aria-label="Menu">
+            <a href="#home"    data-go="home"    class="plank is-home"><span class="ico">🏠</span>Home</a>
+            <a href="#story"   data-go="story"   class="plank"><span class="ico">❤️</span>Our Story</a>
+            <a href="#wedding" data-go="wedding" class="plank"><span class="ico">💍</span>Wedding</a>
+            <a href="#travel"  data-go="travel"  class="plank"><span class="ico">🗺️</span>Travel</a>
+            <a href="#rsvp"    data-go="rsvp"    class="plank"><span class="ico">✉️</span>RSVP</a>
+          </nav>
+
+          <!-- right "Big Day" board -->
+          <aside class="bigday" aria-label="Wedding details">
+            <div class="bd-title"><span aria-hidden="true">🌸</span> The Big Day <span aria-hidden="true">🌸</span></div>
+            <ul class="bd-list">
+              <li><span class="ico">📅</span><span>May 15, 2027<small>Saturday</small></span></li>
+              <li><span class="ico">📍</span><span>Durham, NC</span></li>
+              <li><span class="ico">⛪</span><span>Duke Chapel</span></li>
+            </ul>
+            <a href="#wedding" data-go="wedding" class="bd-btn">💌 View Wedding Details <b>›</b></a>
+          </aside>
+
+          <!-- bottom buttons -->
+          <div class="cta">
+            <a href="#story" data-go="story" class="cta-btn"><span class="ico">❤️</span>Read Our Story <b>›</b></a>
+            <a href="#rsvp"  data-go="rsvp"  class="cta-btn cta-pink"><span class="ico">✉️</span>RSVP <b>›</b></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="home-bar">
+        <div class="countdown panel">
+          <div class="cd-label">Days until the Big Day</div>
+          <div class="cd-row">
+            <div class="cd-cell"><b id="cdD">--</b><span>days</span></div>
+            <div class="cd-cell"><b id="cdH">--</b><span>hrs</span></div>
+            <div class="cd-cell"><b id="cdM">--</b><span>min</span></div>
+            <div class="cd-cell"><b id="cdS">--</b><span>sec</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= OUR STORY ================= -->
+    <section id="screen-story" class="screen" data-screen="story" hidden>
+      <header class="sign"><h2>❤ Our Story</h2><p>Meet the players</p></header>
+
+      <h3 class="section-label center">— Choose your character —</h3>
+      <div class="party" id="party"></div>
+
+      <h3 class="section-label center">— Chapter select —</h3>
+
+      <div class="story-layout">
+        <ol class="chapters panel" id="chapterList"></ol>
+
+        <div class="story-main">
+          <div class="scene panel" id="sceneBox">
+            <div class="scene-emoji" id="sceneEmoji">🌸</div>
+            <div class="scene-meta"><span id="sceneYear">2019</span> · <span id="scenePlace">Somewhere</span></div>
+          </div>
+
+          <div class="dialog" id="dialog" tabindex="0" aria-live="polite">
+            <div class="nameplate" id="speaker">Narrator</div>
+            <p id="dialogText"></p>
+            <div class="dialog-next" id="dialogNext">▼</div>
+          </div>
+          <p class="hint">Click the box or press <kbd>Space</kbd> to continue</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= WEDDING ================= -->
+    <section id="screen-wedding" class="screen" data-screen="wedding" hidden>
+      <header class="sign"><h2>💍 The Big Day</h2><p>Main quest</p></header>
+
+      <div class="grid-2">
+        <div class="panel parchment">
+          <h3>Quest Info</h3>
+          <ul class="stat-list">
+            <li><span class="ico">📅</span><div><b>Saturday, May 15, 2027</b><small>Save the date!</small></div></li>
+            <li><span class="ico">⛪</span><div><b>Duke Chapel</b><small>401 Chapel Dr, Durham, NC 27708</small></div></li>
+            <li><span class="ico">📍</span><div><b>Durham, North Carolina</b><small><a href="https://maps.google.com/?q=Duke+Chapel+Durham+NC" target="_blank" rel="noopener">Open in Maps ↗</a></small></div></li>
+            <li><span class="ico">👗</span><div><b>Dress code: Formal / Cocktail</b><small>Comfortable shoes — the quad is grassy!</small></div></li>
+          </ul>
+          <a href="#rsvp" data-go="rsvp" class="btn btn-pink wide">✉ Accept this quest (RSVP)</a>
+        </div>
+
+        <div class="panel parchment">
+          <h3>Objectives</h3>
+          <ol class="objectives">
+            <li><span class="time">3:30 PM</span><span class="obj">Arrive &amp; find your seat at Duke Chapel</span></li>
+            <li><span class="time">4:00 PM</span><span class="obj">Ceremony — witness the vows 💍</span></li>
+            <li><span class="time">5:00 PM</span><span class="obj">Photos on the quad &amp; cocktail hour 🥂</span></li>
+            <li><span class="time">6:30 PM</span><span class="obj">Reception dinner 🍽</span></li>
+            <li><span class="time">8:00 PM</span><span class="obj">First dance &amp; party on the dance floor 💃</span></li>
+            <li><span class="time">10:30 PM</span><span class="obj">Sparkler send-off ✨ <em>Quest complete!</em></span></li>
+          </ol>
+          <p class="note">* Times are placeholders — update in <code>index.html</code>.</p>
+        </div>
+      </div>
+
+      <div class="panel parchment faq">
+        <h3>Villager FAQ</h3>
+        <details><summary>Can I bring a plus-one?</summary><p>Your invitation lists everyone in your party. If it says "and guest," yes! Add them in the RSVP.</p></details>
+        <details><summary>Are kids welcome?</summary><p>Please let us know in the RSVP and we'll do our best to accommodate.</p></details>
+        <details><summary>Is there parking?</summary><p>Yes — Duke has visitor parking near the Chapel. Details coming soon.</p></details>
+        <details><summary>When should I RSVP by?</summary><p>Please RSVP by <b>March 1, 2027</b>.</p></details>
+      </div>
+    </section>
+
+    <!-- ================= TRAVEL ================= -->
+    <section id="screen-travel" class="screen" data-screen="travel" hidden>
+      <header class="sign"><h2>🗺 Travel</h2><p>World map &amp; inventory</p></header>
+
+      <div class="map panel">
+        <div class="map-area">
+        <div class="map-grid" aria-hidden="true"></div>
+        <button class="pin" style="left:18%;top:30%" data-pin="airport">✈<span>RDU Airport</span></button>
+        <button class="pin" style="left:55%;top:55%" data-pin="chapel">⛪<span>Duke Chapel</span></button>
+        <button class="pin" style="left:72%;top:25%" data-pin="hotel">🏨<span>Hotels</span></button>
+        <button class="pin" style="left:38%;top:72%" data-pin="food">🍜<span>Eats</span></button>
+        <button class="pin" style="left:82%;top:70%" data-pin="fun">🌳<span>Explore</span></button>
+        </div>
+        <div class="map-info parchment" id="mapInfo">Tap a pin on the map 📍</div>
+      </div>
+
+      <h3 class="section-label">Inventory</h3>
+      <div class="inventory">
+        <article class="slot panel">
+          <div class="slot-icon">✈</div>
+          <h4>Flying in</h4>
+          <p>Fly into <b>Raleigh-Durham International (RDU)</b> — about 25 minutes from Duke by car.</p>
+        </article>
+        <article class="slot panel">
+          <div class="slot-icon">🏨</div>
+          <h4>Where to stay</h4>
+          <p>Hotel block info coming soon. Look near Duke's campus or downtown Durham.</p>
+        </article>
+        <article class="slot panel">
+          <div class="slot-icon">🚗</div>
+          <h4>Getting around</h4>
+          <p>Rideshare is easiest. A rental car helps if you want to explore the Triangle.</p>
+        </article>
+        <article class="slot panel">
+          <div class="slot-icon">🌸</div>
+          <h4>Side quests</h4>
+          <p>Sarah P. Duke Gardens, American Tobacco Campus, Durham Bulls, and great BBQ!</p>
+        </article>
+        <article class="slot panel">
+          <div class="slot-icon">🍂</div>
+          <h4>Weather</h4>
+          <p>Mid-May in Durham: warm &amp; sunny, ~60–82°F. Pack sunscreen and a light layer for the evening.</p>
+        </article>
+        <article class="slot panel">
+          <div class="slot-icon">❓</div>
+          <h4>Need help?</h4>
+          <p>Questions? Reach out to us anytime — we're happy to help plan your trip.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= RSVP ================= -->
+    <section id="screen-rsvp" class="screen" data-screen="rsvp" hidden>
+      <header class="sign"><h2>✉ RSVP</h2><p>Join the party! Please reply by Mar 1, 2027</p></header>
+
+      <form id="rsvpForm" class="panel parchment rsvp" novalidate>
+        <div class="xp">
+          <span>Party setup</span>
+          <div class="xp-bar"><i id="xpFill"></i></div>
+          <span id="xpText">Step 1/4</span>
+        </div>
+
+        <!-- Step 1 -->
+        <fieldset class="step" data-step="1">
+          <legend>Player 1 — who are you?</legend>
+          <label>Full name<input name="name" required autocomplete="name" placeholder="e.g. Taylor Lin" /></label>
+          <label>Email<input name="email" type="email" required autocomplete="email" placeholder="you@example.com" /></label>
+          <div class="err" data-err="1"></div>
+        </fieldset>
+
+        <!-- Step 2 -->
+        <fieldset class="step" data-step="2" hidden>
+          <legend>Will you join the adventure?</legend>
+          <div class="choices">
+            <label class="choice yes">
+              <input type="radio" name="attending" value="yes" />
+              <span><b>🎉 Accept quest!</b><small>Joyfully attending</small></span>
+            </label>
+            <label class="choice no">
+              <input type="radio" name="attending" value="no" />
+              <span><b>💌 Can't make it</b><small>Sending love from afar</small></span>
+            </label>
+          </div>
+          <div class="err" data-err="2"></div>
+        </fieldset>
+
+        <!-- Step 3 -->
+        <fieldset class="step" data-step="3" hidden>
+          <legend>Build your party</legend>
+          <div class="if-yes">
+            <label>Number of guests (including you)
+              <div class="stepper">
+                <button type="button" data-step-btn="-1" aria-label="Fewer">−</button>
+                <input name="guests" type="number" min="1" max="6" value="1" readonly />
+                <button type="button" data-step-btn="1" aria-label="More">+</button>
+              </div>
+            </label>
+            <div id="guestList" class="guest-list"></div>
+            <label>Dietary restrictions / allergies<input name="dietary" placeholder="Vegetarian, nut allergy, ..." /></label>
+          </div>
+          <div class="if-no">
+            <p class="center">We'll miss you! 🥺 Feel free to leave us a note on the next screen.</p>
+          </div>
+        </fieldset>
+
+        <!-- Step 4 -->
+        <fieldset class="step" data-step="4" hidden>
+          <legend>Final touches</legend>
+          <label class="if-yes">🎵 Song request — what gets you on the dance floor?<input name="song" placeholder="Song – Artist" /></label>
+          <label>💌 A message for Chin-Yi &amp; Sixuan<textarea name="message" rows="4" placeholder="Write something sweet..."></textarea></label>
+          <div class="err" data-err="4"></div>
+        </fieldset>
+
+        <div class="form-nav">
+          <button type="button" class="btn" id="prevBtn">◀ Back</button>
+          <button type="button" class="btn btn-pink" id="nextBtn">Next ▶</button>
+          <button type="submit" class="btn btn-pink" id="submitBtn" hidden>✉ Send RSVP</button>
+        </div>
+      </form>
+
+      <div class="panel parchment done" id="rsvpDone" hidden>
+        <div class="done-badge">♥</div>
+        <h3 id="doneTitle">Quest accepted!</h3>
+        <p id="doneMsg">We can't wait to celebrate with you.</p>
+        <p class="xp-gain">+1000 XP · Achievement unlocked: <b>Wedding Guest</b></p>
+        <div class="form-nav center-row">
+          <a href="#travel" data-go="travel" class="btn">🗺 Plan travel</a>
+          <button type="button" class="btn" id="againBtn">↺ Edit / new RSVP</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

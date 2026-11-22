@@ -123,7 +123,7 @@
     card.innerHTML = `
       <span class="char-tag">${esc(c.tag || "P" + (i + 1))}</span>
       <div class="char-head">
-        <div class="char-portrait">${esc(c.emoji)}</div>
+        <div class="char-portrait${c.photo ? " has-photo" : ""}">${c.photo ? `<img src="${esc(c.photo)}" alt="Pixel portrait of ${esc(c.name)}" />` : esc(c.emoji)}</div>
         <div>
           <div class="char-name">${esc(c.name.toUpperCase())}</div>
           <div class="char-class">Class: <b>${esc(c.className)}</b></div>

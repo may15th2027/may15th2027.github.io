@@ -14,12 +14,12 @@ window.WEDDING_CONFIG = {
   // ---- Character cards (top of "Our Story") — stars are out of 5 ----
   characters: [
     {
-      name: "Chin-Yi", emoji: "👩", tag: "P1",
+      name: "Chin-Yi", emoji: "👩", photo: "assets/chinyi.png", tag: "P1",
       className: "Scientist", origin: "Taiwan 🇹🇼", skill: "Overthinking",
       stats: [["Intelligence", 5], ["Curiosity", 5], ["Patience", 3]],
     },
     {
-      name: "Sixuan", emoji: "👨", tag: "P2",
+      name: "Sixuan", emoji: "👨", photo: "assets/sixuan.png", tag: "P2",
       className: "Computer Scientist", origin: "China 🇨🇳", skill: "Problem Solving",
       stats: [["Intelligence", 5], ["Patience", 5], ["Communication", 4]],
     },

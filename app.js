@@ -206,12 +206,107 @@
       ch = i; line = 0;
       const c = part(i);
       $("#sceneEmoji").textContent = c.emoji;
-      $("#sceneYear").textContent = c.year;
-      $("#scenePlace").textContent = c.place;
+      $("#sceneYear").textContent = c.year || "—";
+      $("#scenePlace").textContent = c.place || "—";
+      $("#vnIcon").textContent = c.emoji;
+      $("#vnNum").textContent = i + 1;
+      $("#vnName").textContent = c.subtitle;
       renderList(); say();
     }
+    // ---- one picture per sentence ----
+    // 1) a picture named in config (3rd item of the line), else
+    // 2) assets/story/<teller>-ch<N>-<line>.png / .jpg (e.g. chinyi-ch1-2.png), else
+    // 3) the animated pixel scene from story-scenes.js, else
+    // 4) the speaker's portrait, else 5) the chapter icon.
+    const photo = $("#scenePhoto"), emojiEl = $("#sceneEmoji"), sceneBox = $("#sceneBox"), stage = $("#sceneStage");
+    const slug = (n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, "");
+    let sceneToken = 0;
+    const imgOk = {}; // remembers which picture files exist
+    function setScene() {
+      const token = ++sceneToken;
+      const [speaker, , pic] = part(ch).lines[line];
+      const sceneKey = `${slug(viewer)}-ch${ch + 1}-${line + 1}`;
+      const base = `assets/story/${sceneKey}`;
+      const chapterBase = `assets/story/${slug(viewer)}-ch${ch + 1}`; // one picture for the whole chapter
+      const portrait = (charOf(speaker) || {}).photo;
+      const drawn = window.StoryScenes && StoryScenes.has(sceneKey);
+      // a drawn scene marked "force" beats the chapter-wide picture (e.g. a different place)
+      const useChapterPic = !(drawn && StoryScenes.forced && StoryScenes.forced(sceneKey));
+      const tries = [pic && { src: pic, kind: "full" },
+                     { src: base + ".png", kind: "full" }, { src: base + ".jpg", kind: "full" },
+                     useChapterPic && { src: chapterBase + ".png", kind: "full" }, useChapterPic && { src: chapterBase + ".jpg", kind: "full" },
+                     !drawn && portrait && { src: portrait, kind: "portrait" }].filter(Boolean)
+                    .filter((t) => imgOk[t.src] !== false);
+      const known = tries.find((t) => imgOk[t.src] === true);
+      const showEmoji = () => { photo.hidden = true; stage.hidden = true; emojiEl.hidden = false; sceneBox.classList.remove("has-full"); };
+      const showDrawn = () => {
+        photo.hidden = true; emojiEl.hidden = true; stage.hidden = false;
+        sceneBox.classList.add("has-full");
+        StoryScenes.render(stage, sceneKey);
+      };
+      // show the drawn scene right away unless we already know a real picture exists
+      if (drawn && !known) showDrawn(); else if (!drawn) stage.hidden = true;
+      const attempt = (i) => {
+        if (token !== sceneToken) return;
+        if (i >= tries.length) return drawn ? null : showEmoji();
+        const t = tries[i], img = new Image();
+        img.onload = () => {
+          imgOk[t.src] = true;
+          if (token !== sceneToken) return;
+          stage.hidden = true; stage.innerHTML = "";
+          photo.src = t.src; photo.className = "scene-photo " + t.kind;
+          photo.alt = t.kind === "portrait" ? speaker : `${speaker}: ${part(ch).lines[line][1]}`;
+          photo.hidden = false; emojiEl.hidden = true;
+          sceneBox.classList.toggle("has-full", t.kind === "full");
+          photo.style.animation = "none"; void photo.offsetWidth; photo.style.animation = "";
+        };
+        img.onerror = () => { imgOk[t.src] = false; attempt(i + 1); };
+        img.src = t.src;
+      };
+      attempt(0);
+    }
+    // speaker name -> character: exact name, or a name inside it ("Stormy (Leia)" -> Leia).
+    // Two or more names ("Chin-Yi & Sixuan") count as the couple, not one character.
+    const namesIn = (name) => CFG.characters.filter((x) => String(name).toLowerCase().includes(x.name.toLowerCase()));
+    const charOf = (name) => CFG.characters.find((x) => x.name === name) || (namesIn(name).length === 1 ? namesIn(name)[0] : null);
+    function setPortrait(name) {
+      const box = $("#dlgPortrait");
+      const c = charOf(name);
+      box.classList.toggle("narrator", !c);
+      box.classList.remove("cutout");
+      box.innerHTML = c ? `<img src="${esc(c.photo)}" alt="">` : (name.includes("&") || namesIn(name).length > 1 ? "💞" : name.startsWith("🔓") ? "🔓" : "📖");
+      // Sticker faces (assets/narrator/<who>-<mood>.png): a character's line shows that character's
+      // sticker, a Narrator line shows the storyteller's sticker. The mood is picked per line.
+      const inLine = line < part(ch).lines.length;
+      // Narrator lines always show the book & quill picture.
+      const who = c ? slug(c.name) : null;
+      const sticker = name === "Narrator" ? "assets/narrator/narrator.png"
+        : inLine && who && window.StoryScenes && StoryScenes.face
+        ? StoryScenes.face(`${slug(viewer)}-ch${ch + 1}-${line + 1}`, who) : null;
+      if (sticker && imgOk[sticker] !== false) {
+        box.classList.remove("narrator"); box.classList.add("cutout");
+        box.innerHTML = `<img src="${esc(sticker)}" alt="">`;
+        const im = box.querySelector("img");
+        im.onerror = () => { imgOk[sticker] = false; if (box.contains(im)) setPortrait(name); };
+      }
+      // a special face for this one sentence: assets/faces/<teller>-ch<N>-<line>.png (e.g. chinyi-ch1-2.png)
+      if (c && line < part(ch).lines.length) {
+        const face = `assets/faces/${slug(viewer)}-ch${ch + 1}-${line + 1}.png`, token = sceneToken;
+        const use = () => { const im = box.querySelector("img"); if (im && token === sceneToken) { im.src = face; box.classList.add("cutout"); } };
+        if (imgOk[face] === true) use();
+        else if (imgOk[face] !== false) {
+          const probe = new Image();
+          probe.onload = () => { imgOk[face] = true; use(); };
+          probe.onerror = () => { imgOk[face] = false; };
+          probe.src = face;
+        }
+      }
+    }
     function say() {
-      const [name, txt] = part(ch).lines[line];
+      setScene();
+      const [name, txt, , place] = part(ch).lines[line];
+      $("#scenePlace").textContent = place || part(ch).place || "—"; // each sentence has its own place
+      setPortrait(name);
       who.textContent = name; full = txt; textEl.textContent = "";
       let k = 0; clearInterval(typing);
       typing = setInterval(() => {
@@ -231,7 +326,7 @@
           justUnlocked = ch + 1;
           renderList();
           const n = part(ch + 1);
-          who.textContent = "🔓 Unlocked!";
+          who.textContent = "🔓 Unlocked!"; setPortrait("🔓");
           textEl.textContent = `Chapter ${ch + 2} unlocked: ${n.emoji} ${n.subtitle}\nClick to continue →`;
           full = "__goto:" + (ch + 1);
           sfx.fanfare();
@@ -240,7 +335,7 @@
         }
       } else {
         // story finished → RSVP pop-up
-        who.textContent = "★";
+        who.textContent = "★"; setPortrait("💞 &");
         textEl.textContent = "THE END... of the beginning! ♥";
         full = "__end";
         sfx.fanfare();

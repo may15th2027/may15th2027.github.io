@@ -8,7 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'><path fill='%23e5484d' d='M2 3h4v1h1v1h2V4h1V3h4v1h1v5h-1v1h-1v1h-1v1h-1v1h-1v1H8v1H7v-1H6v-1H5v-1H4v-1H3v-1H2V9H1V4h1z'/></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=VT323&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -103,21 +103,26 @@
       <h3 class="section-label center" id="storyTitle">— Chapter select —</h3>
 
       <div class="story-layout">
-        <ol class="chapters panel" id="chapterList"></ol>
-
-        <div class="story-main">
-          <div class="scene panel" id="sceneBox">
-            <div class="scene-emoji" id="sceneEmoji">🌸</div>
-            <div class="scene-meta"><span id="sceneYear">2019</span> · <span id="scenePlace">Somewhere</span></div>
+        <!-- visual-novel frame: scene + chapter scroll + place badge + dialogue -->
+        <div class="vn" id="sceneBox">
+          <div class="vn-crop">
+            <div class="vn-canvas">
+              <div class="scene-emoji" id="sceneEmoji">🌸</div>
+              <img class="scene-photo" id="scenePhoto" alt="" hidden />
+              <div class="sc-stage" id="sceneStage" aria-hidden="true" hidden></div>
+              <div class="vn-title"><span class="vn-title-icon" id="vnIcon">🏸</span><span>Ch. <span id="vnNum">1</span></span><b id="vnName">How we met</b></div>
+              <div class="vn-badge"><span>🏛️ <span id="scenePlace">Somewhere</span></span><span>📅 <span id="sceneYear">20XX</span></span></div>
+            </div>
           </div>
-
           <div class="dialog" id="dialog" tabindex="0" aria-live="polite">
+            <div class="dlg-portrait" id="dlgPortrait" aria-hidden="true"></div>
             <div class="nameplate" id="speaker">Narrator</div>
             <p id="dialogText"></p>
             <div class="dialog-next" id="dialogNext">▼</div>
           </div>
-          <p class="hint">Click the box or press <kbd>Space</kbd> to continue</p>
         </div>
+        <p class="hint">Click the box or press <kbd>Space</kbd> to continue</p>
+        <ol class="chapters panel" id="chapterList"></ol>
       </div>
     </section>
 
@@ -295,6 +300,7 @@
 
   <div id="confetti" class="confetti" aria-hidden="true"></div>
   <script src="config.js"></script>
+  <script src="story-scenes.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -90,7 +90,7 @@
   }
   // cat easter egg
   const catSpeech = $("#catSpeech");
-  const catLines = ["Meow! Did you RSVP yet? 🐾", "Purrr... see you May 15! 💕", "*knocks your phone off the table*", "Mrrp! I'm the ring bearer. 💍"];
+  const catLines = ["Meow! I'm Leia. Did you RSVP yet? 🐾", "Purrr... see you May 15! 💕", "*knocks your phone off the table*", "Mrrp! I'm the ring bearer. 💍"];
   let catI = 0, catT;
   $("#catBtn").addEventListener("click", () => {
     sfx.meow();
@@ -125,7 +125,7 @@
       <div class="char-head">
         <div class="char-portrait${c.photo ? " has-photo" : ""}">${c.photo ? `<img src="${esc(c.photo)}" alt="Pixel portrait of ${esc(c.name)}" />` : esc(c.emoji)}</div>
         <div>
-          <div class="char-name">${esc(c.name.toUpperCase())}</div>
+          <div class="char-name">${esc(c.name.toUpperCase())}${c.nameIcon ? ` <span class="name-icon">${esc(c.nameIcon)}</span>` : ""}</div>
           <div class="char-class">Class: <b>${esc(c.className)}</b></div>
         </div>
       </div>
@@ -134,13 +134,14 @@
         <dt>Special Skill</dt><dd>${esc(c.skill)}</dd>
       </dl>
       <ul class="char-stats">${c.stats.map(([k, n]) => `<li><span>${esc(k)}</span>${stars(n)}</li>`).join("")}</ul>
-      <span class="char-select">▶ SELECTED!</span>`;
+      <span class="char-play">▶ See the story as ${esc(c.name)}</span>
+      <span class="char-select">♥ TELLING THE STORY ♥</span>`;
     card.addEventListener("click", () => {
-      $$(".char", party).forEach((x) => { x.classList.toggle("picked", x === card); x.setAttribute("aria-pressed", x === card); });
       sfx.select();
+      story.view(c.name, true);
     });
     party.appendChild(card);
-    if (i === 0 && CFG.characters.length > 1) {
+    if (i === 0 && CFG.characters.length === 2) {
       const vs = document.createElement("div");
       vs.className = "char-vs"; vs.textContent = "♥"; vs.setAttribute("aria-hidden", "true");
       party.appendChild(vs);
@@ -148,34 +149,69 @@
   });
 
   /* ================= STORY (RPG dialogue) ================= */
+  // Same 5 moments; each teller (Narrator / character) has their own chapter names and
+  // their own unlock progress — finish a chapter to unlock the next one in that version.
   const story = (() => {
     const list = $("#chapterList"), textEl = $("#dialogText"), who = $("#speaker"), dlg = $("#dialog");
-    let unlocked = store.get("chapters", 1);
+    const chapters = CFG.story;
+    let viewer = CFG.characters[0].name; // every version belongs to a character; first one by default
     let ch = 0, line = 0, typing = null, full = "";
 
+    // chapter as told by the current character
+    const part = (i, v = viewer) => {
+      const base = chapters[i], o = (base.views && base.views[v]) || {};
+      return { emoji: o.emoji || "📖", subtitle: o.subtitle || base.moment || "", year: o.year || "",
+               place: o.place || "", lines: o.lines && o.lines.length ? o.lines : [["Narrator", "(This chapter hasn't been written yet.)"]] };
+    };
+    const key = (v = viewer) => "progress:" + v;
+    const unlocked = (v = viewer) => Math.min(chapters.length, Math.max(1, store.get(key(v), 1)));
+    let justUnlocked = -1;
+
     function renderList() {
+      const u = unlocked();
       list.innerHTML = "";
-      CFG.story.forEach((c, i) => {
+      chapters.forEach((_, i) => {
+        const c = part(i);
         const li = document.createElement("li");
         const b = document.createElement("button");
         b.type = "button";
-        b.disabled = i >= unlocked;
-        b.className = i === ch ? "current" : "";
-        b.innerHTML = i < unlocked ? `${c.emoji} ${c.title}<small>${c.subtitle}</small>` : `🔒 ${c.title}<small>Locked</small>`;
+        b.disabled = i >= u;
+        b.className = (i === ch ? "current" : "") + (i === justUnlocked ? " just-unlocked" : "");
+        b.innerHTML = i < u ? `${esc(c.emoji)} Chapter ${i + 1}<small>${esc(c.subtitle)}</small>` : `🔒 Chapter ${i + 1}<small>Locked</small>`;
         b.addEventListener("click", () => { sfx.blip(); load(i); });
         li.appendChild(b); list.appendChild(li);
       });
+      if (u > 1) {
+        const li = document.createElement("li");
+        const r = document.createElement("button");
+        r.type = "button"; r.className = "restart"; r.textContent = "↺ Restart this story";
+        r.addEventListener("click", () => { sfx.blip(); store.set(key(), 1); justUnlocked = -1; load(0); });
+        li.appendChild(r); list.appendChild(li);
+      }
+    }
+    // Switch to a character's version. Each version is independent;
+    // inside a version, finishing a chapter unlocks the next.
+    function view(name, scroll) {
+      viewer = name;
+      $$(".char", party).forEach((x, i) => {
+        const on = CFG.characters[i].name === viewer;
+        x.classList.toggle("picked", on); x.setAttribute("aria-pressed", on);
+      });
+      $("#storyTitle").textContent = `— Our story · told by ${viewer} —`;
+      justUnlocked = -1;
+      load(Math.min(ch, unlocked() - 1)); // same moment if this version has unlocked it
+      if (scroll) $("#storyTitle").scrollIntoView({ behavior: "smooth", block: "start" });
     }
     function load(i) {
       ch = i; line = 0;
-      const c = CFG.story[i];
+      const c = part(i);
       $("#sceneEmoji").textContent = c.emoji;
       $("#sceneYear").textContent = c.year;
       $("#scenePlace").textContent = c.place;
       renderList(); say();
     }
     function say() {
-      const [name, txt] = CFG.story[ch].lines[line];
+      const [name, txt] = part(ch).lines[line];
       who.textContent = name; full = txt; textEl.textContent = "";
       let k = 0; clearInterval(typing);
       typing = setInterval(() => {
@@ -186,28 +222,77 @@
     }
     function advance() {
       if (typing) { clearInterval(typing); typing = null; textEl.textContent = full; return; }
-      const c = CFG.story[ch];
-      if (line < c.lines.length - 1) { line++; say(); return; }
-      // chapter finished
-      if (ch < CFG.story.length - 1) {
-        if (unlocked < ch + 2) { unlocked = ch + 2; store.set("chapters", unlocked); sfx.fanfare(); }
-        load(ch + 1);
+      if (line < part(ch).lines.length - 1) { line++; say(); return; }
+      // chapter finished → unlock the next chapter of this story
+      if (ch < chapters.length - 1) {
+        if (unlocked() < ch + 2) {
+          // newly unlocked: announce it in the dialogue box, flash it in the chapter list
+          store.set(key(), ch + 2);
+          justUnlocked = ch + 1;
+          renderList();
+          const n = part(ch + 1);
+          who.textContent = "🔓 Unlocked!";
+          textEl.textContent = `Chapter ${ch + 2} unlocked: ${n.emoji} ${n.subtitle}\nClick to continue →`;
+          full = "__goto:" + (ch + 1);
+          sfx.fanfare();
+        } else {
+          load(ch + 1);
+        }
       } else {
+        // story finished → RSVP pop-up
         who.textContent = "★";
-        textEl.textContent = "THE END... of the beginning! ♥\nClick to RSVP →";
+        textEl.textContent = "THE END... of the beginning! ♥";
         full = "__end";
+        sfx.fanfare();
+        setTimeout(openPop, 500);
       }
     }
+    function toast(msg) {
+      const t = document.createElement("div");
+      t.className = "toast"; t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2600);
+    }
+
+    // RSVP pop-up shown when a story ends
+    const pop = document.createElement("div");
+    pop.className = "pop"; pop.hidden = true;
+    pop.setAttribute("role", "dialog"); pop.setAttribute("aria-modal", "true"); pop.setAttribute("aria-labelledby", "popTitle");
+    pop.innerHTML = `
+      <div class="pop-box parchment">
+        <div class="pop-heart">💌</div>
+        <h3 id="popTitle">Story complete!</h3>
+        <p>The next chapter happens at <b>Duke Chapel</b> on <b>May 15, 2027</b> — and we want you in it!</p>
+        <div class="pop-actions">
+          <button type="button" class="btn btn-pink" data-pop="rsvp">✉ RSVP now</button>
+          <button type="button" class="btn" data-pop="close">Keep exploring</button>
+        </div>
+      </div>`;
+    document.body.appendChild(pop);
+    function openPop() {
+      pop.hidden = false;
+      $('[data-pop="rsvp"]', pop).focus();
+    }
+    function closePop() { pop.hidden = true; }
+    pop.addEventListener("click", (e) => {
+      const a = e.target.closest("[data-pop]");
+      if (e.target === pop || (a && a.dataset.pop === "close")) { sfx.blip(); closePop(); return; }
+      if (a && a.dataset.pop === "rsvp") { sfx.select(); closePop(); history.pushState(null, "", "#rsvp"); show("rsvp"); }
+    });
+    window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) { e.stopImmediatePropagation(); closePop(); } }, true);
+
     dlg.addEventListener("click", () => {
-      if (full === "__end") { history.pushState(null, "", "#rsvp"); show("rsvp"); sfx.select(); return; }
+      if (full === "__end") { sfx.select(); openPop(); return; }
+      if (full.startsWith("__goto:")) { sfx.select(); const i = +full.slice(7); justUnlocked = -1; load(i); return; }
       advance();
     });
     window.addEventListener("keydown", (e) => {
-      if ($("#screen-story").hidden) return;
+      if ($("#screen-story").hidden || !pop.hidden) return;
+      if (e.target !== dlg && e.target.closest && e.target.closest("button, a, input, textarea, select")) return;
       if (e.key === " " || e.key === "Enter") { e.preventDefault(); dlg.click(); }
     });
     let entered = false;
-    return { enter: () => { if (!entered) { entered = true; load(0); } } };
+    return { view, enter: () => { if (!entered) { entered = true; view(viewer); } } };
   })();
 
   /* ================= TRAVEL MAP ================= */

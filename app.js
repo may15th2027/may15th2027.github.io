@@ -107,8 +107,13 @@
       art.classList.add("night"); setNight(true);
     });
     window.addEventListener("pointerup", day);
-    window.addEventListener("pointercancel", day);
+    // iPhone Safari may cancel the pointer partway through a long press; for touch, wait for the finger to actually lift
+    window.addEventListener("pointercancel", (e) => { if (e.pointerType !== "touch") day(); });
+    window.addEventListener("touchend", day);
+    window.addEventListener("touchcancel", day);
     art.addEventListener("contextmenu", (e) => { if (!e.target.closest("a, button")) e.preventDefault(); }); // long-press menu on phones
+    art.addEventListener("selectstart", (e) => e.preventDefault()); // iPhone long-press text/image selection
+    art.addEventListener("dragstart", (e) => e.preventDefault());
     window.addEventListener("blur", day);
   })();
 

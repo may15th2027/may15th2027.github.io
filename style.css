@@ -688,7 +688,12 @@ body.lb-open { overflow: hidden; }
 .hero-night { position: absolute; inset: 0; opacity: 0; transition: opacity .35s; pointer-events: none; }
 .hero-art.night .hero-night { opacity: 1; }
 /* phones: holding a finger on the art shouldn't select it or pop up "save image" */
-.hero-art { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.hero-art, .hero-art * {
+  -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+  -webkit-user-drag: none; -webkit-tap-highlight-color: transparent;
+}
+/* iPhone: let the finger land on the art box, not on the <img>, so Safari has no image to select or preview */
+.hero-art .hero-img { pointer-events: none; }
 
 /* ===== flower cursor: a pixel cherry blossom, brighter pink over things you can click ===== */
 :root {

@@ -194,7 +194,7 @@
   // Same 5 moments; each teller (Narrator / character) has their own chapter names and
   // their own unlock progress — finish a chapter to unlock the next one in that version.
   const story = (() => {
-    const list = $("#chapterList"), textEl = $("#dialogText"), who = $("#speaker"), dlg = $("#dialog");
+    const list = $("#chapterList"), textEl = $("#dialogText"), who = $("#speaker"), dlg = $("#dialog"), backBtn = $("#dialogBack");
     const chapters = CFG.story;
     let viewer = CFG.characters[0].name; // every version belongs to a character; first one by default
     let ch = 0, line = 0, typing = null, full = "";
@@ -244,8 +244,8 @@
       load(Math.min(ch, unlocked() - 1)); // same moment if this version has unlocked it
       if (scroll) $("#storyTitle").scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    function load(i) {
-      ch = i; line = 0;
+    function load(i, at = 0, instant = false) {
+      ch = i; line = at;
       const c = part(i);
       $("#sceneEmoji").textContent = c.emoji;
       $("#sceneYear").textContent = c.year || "—";
@@ -253,7 +253,7 @@
       $("#vnIcon").textContent = c.emoji;
       $("#vnNum").textContent = i + 1;
       $("#vnName").textContent = c.subtitle;
-      renderList(); say();
+      renderList(); say(instant);
     }
     // ---- one picture per sentence ----
     // 1) a picture named in config (3rd item of the line), else
@@ -341,13 +341,15 @@
         }
       }
     }
-    function say() {
+    function say(instant = false) {
       setScene();
       const [name, txt, , place] = part(ch).lines[line];
       $("#scenePlace").textContent = place || part(ch).place || "—"; // each sentence has its own place
       setPortrait(name);
+      backBtn.hidden = ch === 0 && line === 0; // nothing before the very first line
       who.textContent = name; full = txt; textEl.textContent = "";
-      let k = 0; clearInterval(typing);
+      let k = 0; clearInterval(typing); typing = null;
+      if (instant) { textEl.textContent = full; return; } // going back: show the whole line at once
       typing = setInterval(() => {
         textEl.textContent = full.slice(0, ++k);
         if (k % 2) sfx.type();
@@ -380,6 +382,14 @@
         sfx.fanfare();
         setTimeout(openPop, 500);
       }
+    }
+    // ◀ Back: previous line; from a chapter's first line, the last line of the chapter before;
+    // from the "Unlocked!" / "THE END" box, the last line of the chapter just finished.
+    function back() {
+      if (full === "__end" || full.startsWith("__goto:")) { justUnlocked = -1; say(true); return; }
+      if (typing) { clearInterval(typing); typing = null; }
+      if (line > 0) { line--; say(true); return; }
+      if (ch > 0) load(ch - 1, part(ch - 1).lines.length - 1, true);
     }
     function toast(msg) {
       const t = document.createElement("div");
@@ -415,6 +425,7 @@
     });
     window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) { e.stopImmediatePropagation(); closePop(); } }, true);
 
+    backBtn.addEventListener("click", (e) => { e.stopPropagation(); sfx.blip(); back(); });
     dlg.addEventListener("click", () => {
       if (full === "__end") { sfx.select(); openPop(); return; }
       if (full.startsWith("__goto:")) { sfx.select(); const i = +full.slice(7); justUnlocked = -1; load(i); return; }
@@ -423,7 +434,8 @@
     window.addEventListener("keydown", (e) => {
       if ($("#screen-story").hidden || !pop.hidden) return;
       if (e.target !== dlg && e.target.closest && e.target.closest("button, a, input, textarea, select")) return;
-      if (e.key === " " || e.key === "Enter") { e.preventDefault(); dlg.click(); }
+      if (e.key === " " || e.key === "Enter" || e.key === "ArrowRight") { e.preventDefault(); dlg.click(); }
+      if (e.key === "ArrowLeft" && !backBtn.hidden) { e.preventDefault(); backBtn.click(); }
     });
     let entered = false;
     return { view, enter: () => { if (!entered) { entered = true; view(viewer); } } };

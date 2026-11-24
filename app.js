@@ -10,7 +10,7 @@
   /* ================= SOUND (tiny 8-bit blips) ================= */
   let soundOn = store.get("sound", true);
   let actx;
-  function tone(freq, dur = 0.07, type = "square", vol = 0.05, when = 0) {
+  function tone(freq, dur = 0.07, type = "square", vol = 0.3, when = 0) {
     if (!soundOn) return;
     try {
       actx = actx || new (window.AudioContext || window.webkitAudioContext)();
@@ -24,7 +24,7 @@
   const sfx = {
     blip: () => tone(660, 0.05),
     select: () => { tone(523, 0.06); tone(784, 0.08, "square", 0.05, 0.06); },
-    type: () => tone(880 + Math.random() * 120, 0.02, "square", 0.02),
+    type: () => tone(880 + Math.random() * 120, 0.02, "square", 0.05),
     meow: () => { tone(700, 0.12, "triangle", 0.08); tone(520, 0.18, "triangle", 0.07, 0.1); },
     fanfare: () => [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, 0.14, "square", 0.05, i * 0.12)),
     error: () => tone(160, 0.15, "sawtooth", 0.04),
@@ -32,7 +32,17 @@
   const soundBtn = $("#soundBtn");
   const paintSound = () => (soundBtn.textContent = soundOn ? "♪ ON" : "♪ OFF");
   paintSound();
-  soundBtn.addEventListener("click", () => { soundOn = !soundOn; store.set("sound", soundOn); paintSound(); sfx.blip(); });
+  // background music (music.js): needs a click/key first, because browsers block sound until then
+  function audio() {
+    try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch {}
+    return actx;
+  }
+  function music() { if (!window.BGM) return; if (soundOn && !document.hidden) BGM.play(audio()); else BGM.stop(); }
+  const firstGesture = () => { music(); window.removeEventListener("pointerdown", firstGesture); window.removeEventListener("keydown", firstGesture); };
+  window.addEventListener("pointerdown", firstGesture);
+  window.addEventListener("keydown", firstGesture);
+  document.addEventListener("visibilitychange", () => { if (window.BGM && (BGM.playing || !document.hidden)) music(); });
+  soundBtn.addEventListener("click", () => { soundOn = !soundOn; store.set("sound", soundOn); paintSound(); sfx.blip(); music(); });
 
   /* ================= BOOT ================= */
   const boot = $("#boot");
@@ -275,7 +285,16 @@
       const c = charOf(name);
       box.classList.toggle("narrator", !c);
       box.classList.remove("cutout");
-      box.innerHTML = c ? `<img src="${esc(c.photo)}" alt="">` : (name.includes("&") || namesIn(name).length > 1 ? "💞" : name.startsWith("🔓") ? "🔓" : "📖");
+      // both of us speaking ("Chin-Yi & Sixuan") -> the two-of-us picture; end of the story -> the-end.png.
+      // Both are landscape pictures, so the portrait box (and the text beside it) gets wider.
+      const couple = name === "__end" ? "assets/narrator/the-end.png"
+        : !c && namesIn(name).length > 1 ? "assets/narrator/sixuan-and-chinyi.png" : null;
+      // "🔓 Unlocked!" message -> unlocked.png (normal size, not landscape)
+      const special = couple || (name.startsWith("🔓") ? "assets/narrator/unlocked.png" : null);
+      box.classList.toggle("wide", !!couple);
+      $("#dialog").classList.toggle("wide-portrait", !!couple);
+      box.innerHTML = c ? `<img src="${esc(c.photo)}" alt="">` : special ? `<img src="${special}" alt="">` : "💞";
+      if (special) { box.classList.remove("narrator"); box.classList.add("cutout"); }
       // Sticker faces (assets/narrator/<who>-<mood>.png): a character's line shows that character's
       // sticker, a Narrator line shows the storyteller's sticker. The mood is picked per line.
       const inLine = line < part(ch).lines.length;
@@ -336,7 +355,7 @@
         }
       } else {
         // story finished → RSVP pop-up
-        who.textContent = "★"; setPortrait("💞 &");
+        who.textContent = "★"; setPortrait("__end");
         textEl.textContent = "THE END... of the beginning! ♥";
         full = "__end";
         sfx.fanfare();

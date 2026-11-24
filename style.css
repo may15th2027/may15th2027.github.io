@@ -523,96 +523,6 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
 @keyframes photoIn { from { opacity: 0; transform: scale(.96); } }
 @media (max-width: 700px) { .scene-photo.portrait { width: 110px; height: 118px; } }
 
-/* ---------- animated story scenes (story-scenes.js) ---------- */
-.sc-stage { position: absolute; inset: 0; overflow: hidden; z-index: 1; image-rendering: pixelated; --sc-h: 260px; }
-.sc-stage[hidden] { display: none; }
-.sc-actor { position: absolute; transform: translateX(-50%); }
-.sc-actor .sc-move { height: 100%; position: relative; }
-.sc-actor img { height: 100%; width: auto; display: block; image-rendering: pixelated;
-  filter: drop-shadow(2px 0 0 #2b1a14) drop-shadow(-2px 0 0 #2b1a14) drop-shadow(0 2px 0 #2b1a14) drop-shadow(0 -2px 0 #2b1a14) drop-shadow(0 6px 0 rgba(0,0,0,.18)); }
-.sc-prop { position: absolute; transform: translate(-50%, -50%); line-height: 1; z-index: 2; }
-.sc-prop .sc-move { display: inline-block; filter: drop-shadow(2px 2px 0 rgba(0,0,0,.25)); }
-.sc-text { font: 700 1em var(--font); color: #fff; background: var(--pink); padding: .1em .35em; box-shadow: 0 0 0 3px var(--pink-dark); text-shadow: 2px 2px 0 var(--pink-dark); }
-.sc-frame { height: 100%; padding: 6%; background: #fff8e6; box-shadow: 0 0 0 4px #8b5a2b, 0 0 0 7px #2b1a14; transform: rotate(-4deg); }
-.sc-frame img { filter: none !important; }
-.sc-ghost { filter: brightness(0) invert(1) drop-shadow(0 0 4px #fff) !important; opacity: .6; }
-.sc-outfit { position: absolute; left: 0; top: 0; }
-.sc-outfit.o0 { position: relative; }
-.sc-outfit { animation: outfitCycle 2.4s steps(1) infinite; }
-.sc-outfit.o1 { animation-delay: .8s; opacity: 0; }
-.sc-outfit.o2 { animation-delay: 1.6s; opacity: 0; }
-@keyframes outfitCycle { 0% { opacity: 1; } 33.3% { opacity: 0; } 100% { opacity: 0; } }
-.sc-outfit.o0 { animation-name: outfitFirst; }
-@keyframes outfitFirst { 0% { opacity: 1; } 33.3% { opacity: 0; } 100% { opacity: 0; } }
-
-/* actor motions */
-.m-idle   { animation: scIdle 1.2s steps(2) infinite; }
-.m-enterL { animation: scEnterL 1.1s steps(8) both, scIdle 1.2s steps(2) 1.1s infinite; }
-.m-enterR { animation: scEnterR 1.1s steps(8) both, scIdle 1.2s steps(2) 1.1s infinite; }
-.m-walk   { animation: scWalk .5s steps(2) infinite; }
-.m-jump   { animation: scJump .7s steps(4) infinite; }
-.m-shake  { animation: scShake .5s steps(4) infinite; }
-.m-flex   { animation: scFlex .8s steps(3) infinite; transform-origin: 50% 100%; }
-.m-kneel  { animation: scKneel .8s steps(4) forwards; transform-origin: 50% 100%; }
-.m-sleep  { animation: scSleep 2s steps(3) infinite; transform-origin: 50% 100%; }
-.m-track  { animation: scTrack 1.6s steps(4) infinite; }
-.m-wave   { animation: scWave .6s steps(2) infinite; transform-origin: 50% 100%; }
-.m-swipe  { animation: scSwipe .9s steps(3) infinite; transform-origin: 50% 100%; }
-.m-patrol { animation: scPatrol 3s steps(12) infinite alternate; }
-.m-hugL   { animation: scHugL 1s steps(5) forwards; }
-.m-hugR   { animation: scHugR 1s steps(5) forwards; }
-.m-bow    { animation: scBow 1.4s steps(3) infinite; transform-origin: 50% 100%; }
-.m-blink  { animation: scBlink 1s steps(2) infinite; }
-.m-outfit { animation: scIdle 1.2s steps(2) infinite; }
-/* prop motions */
-.m-pop     { animation: scPop .45s steps(4) both, scIdle 1.4s steps(2) .45s infinite; }
-.m-bounce  { animation: scBounce .9s steps(3) infinite; }
-.m-float   { animation: scFloat 2s steps(4) infinite; }
-.m-twinkle { animation: scTwinkle 1.2s steps(3) infinite; }
-.m-spin    { animation: scSpin 2s steps(8) infinite; }
-.m-arc     { animation: scArc 1.6s linear infinite alternate; }
-.m-drop    { animation: scDrop 1.2s steps(6) forwards; }
-.m-fade    { animation: scFade 1.6s steps(6) forwards; }
-.m-rise    { animation: scRise 2.6s steps(10) infinite; }
-.m-fall    { animation: scFall 2.4s steps(10) infinite; }
-.m-drive   { animation: scDrive 3s steps(16) infinite; }
-.m-drift   { animation: scDrift 6s steps(20) infinite; }
-.m-beat    { animation: beat .5s steps(2) infinite; }
-.m-nudge   { animation: scNudge .6s steps(2) infinite; }
-.m-cycle   { opacity: 0; animation: scCycle 4s steps(1) infinite; }
-
-@keyframes scIdle   { 50% { transform: translateY(-3%); } }
-@keyframes scEnterL { from { transform: translateX(-60vw); } }
-@keyframes scEnterR { from { transform: translateX(60vw); } }
-@keyframes scWalk   { 50% { transform: translate(4%, -4%); } }
-@keyframes scJump   { 50% { transform: translateY(-18%); } }
-@keyframes scShake  { 25% { transform: translateX(-5%) rotate(-3deg); } 75% { transform: translateX(5%) rotate(3deg); } }
-@keyframes scFlex   { 50% { transform: scale(1.12, 1.04); } }
-@keyframes scKneel  { to { transform: translateY(14%) scaleY(.82); } }
-@keyframes scSleep  { 50% { transform: scaleY(.92); } }
-@keyframes scTrack  { 25% { transform: translateX(-8%); } 75% { transform: translateX(8%); } }
-@keyframes scWave   { 50% { transform: rotate(-6deg); } }
-@keyframes scSwipe  { 50% { transform: rotate(-12deg) translateX(-6%); } }
-@keyframes scPatrol { to { transform: translateX(160%); } }
-@keyframes scHugL   { to { transform: translateX(22%); } }
-@keyframes scHugR   { to { transform: translateX(-22%); } }
-@keyframes scBow    { 50% { transform: scaleY(.9) translateY(4%); } }
-@keyframes scBlink  { 50% { opacity: .25; } }
-@keyframes scPop    { from { transform: scale(0); } 70% { transform: scale(1.25); } to { transform: scale(1); } }
-@keyframes scBounce { 50% { transform: translateY(-25%); } }
-@keyframes scFloat  { 50% { transform: translateY(-15%) rotate(4deg); } }
-@keyframes scTwinkle{ 0%, 100% { transform: scale(.7); opacity: .6; } 50% { transform: scale(1.15); opacity: 1; } }
-@keyframes scSpin   { to { transform: rotate(360deg); } }
-@keyframes scArc    { 0% { transform: translate(calc(var(--sc-h) * -1.1), 40%) rotate(-40deg); } 50% { transform: translate(0, -60%) rotate(0deg); } 100% { transform: translate(calc(var(--sc-h) * 1.1), 40%) rotate(40deg); } }
-@keyframes scDrop   { from { transform: translateY(-150%); } 70% { transform: translateY(40%); } to { transform: translateY(30%) rotate(80deg); } }
-@keyframes scFade   { from { opacity: 1; } to { opacity: 0; transform: translateY(40%); } }
-@keyframes scRise   { from { transform: translateY(0) scale(.6); opacity: 0; } 15% { opacity: 1; } to { transform: translateY(calc(var(--sc-h) * -.7)) scale(1.1); opacity: 0; } }
-@keyframes scFall   { from { transform: translateY(0) rotate(0); } to { transform: translateY(calc(var(--sc-h) * 1.2)) rotate(300deg); } }
-@keyframes scDrive  { from { transform: translateX(-60vw); } to { transform: translateX(60vw); } }
-@keyframes scDrift  { 0% { transform: translateX(0); } 50% { transform: translateX(calc(var(--sc-h) * 1.5)) translateY(-20%); } 100% { transform: translateX(0); } }
-@keyframes scNudge  { 50% { transform: translateX(25%); } }
-@keyframes scCycle  { 0% { opacity: 1; } 25% { opacity: 0; } 100% { opacity: 0; } }
-
 /* =========================================================
    Visual-novel story frame (scene + scroll + badge + dialogue)
    Positions are % of a 16:9 canvas so they line up with
@@ -625,7 +535,6 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
 .vn .scene-photo.full { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .vn .scene-photo.portrait { position: absolute; left: 50%; top: 34%; transform: translate(-50%, -50%); width: 18cqw; height: auto; aspect-ratio: .93; }
 .vn .scene-emoji { position: absolute; left: 50%; top: 34%; transform: translate(-50%, -50%); font-size: 12cqw; }
-.vn .sc-stage { inset: 0 0 29% 0; }
 
 /* chapter scroll (top-left) */
 .vn-title {
@@ -677,7 +586,6 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
 /* phone: crop away the bottom of the art and put the dialogue under it */
 @media (max-width: 700px) {
   .vn-crop { aspect-ratio: 1672 / 592; }
-  .vn .sc-stage { inset: 0; }
   .vn .dialog { position: relative; inset: auto; margin: 14px 8px 10px; min-height: 120px; padding: 26px 14px 14px 96px; font-size: 16px; border-radius: 8px;
     box-shadow: 0 0 0 3px #c98a4b, 0 0 0 6px #5a3418; }
   .vn .nameplate { left: 92px; bottom: auto; top: -18px; padding: 3px 12px; font-size: 15px; border-radius: 6px; box-shadow: 0 0 0 3px #c98a4b, 0 0 0 5px #5a3418; }
@@ -698,7 +606,7 @@ input, select, textarea { font-family: var(--font-read) !important; font-weight:
 /* keep the game look on titles, names, signs and buttons */
 h1, h2, h3, h4, button, .btn, .cta-btn, .topnav, .sign, .plank, .section-label, .nameplate,
 .char-name, .char-tag, .char-select, .char-play, .char-vs, .countdown, .cd-cell, .time, .home-bar,
-.hud, .hud-btn, .xp, .done-badge, .vn-title, .vn-badge, .step, .choice, .pin, .slot-icon, .sc-text, kbd {
+.hud, .hud-btn, .xp, .done-badge, .vn-title, .vn-badge, .step, .choice, .pin, .slot-icon, kbd {
   font-family: var(--font);
 }
 /* small text reads better in the clear font */

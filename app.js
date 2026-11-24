@@ -253,9 +253,9 @@
     // ---- one picture per sentence ----
     // 1) a picture named in config (3rd item of the line), else
     // 2) assets/story/<teller>-ch<N>-<line>.png / .jpg (e.g. chinyi-ch1-2.png), else
-    // 3) the animated pixel scene from story-scenes.js, else
+    // 3) the chapter picture assets/story/<teller>-ch<N>.png / .jpg, else
     // 4) the speaker's portrait, else 5) the chapter icon.
-    const photo = $("#scenePhoto"), emojiEl = $("#sceneEmoji"), sceneBox = $("#sceneBox"), stage = $("#sceneStage");
+    const photo = $("#scenePhoto"), emojiEl = $("#sceneEmoji"), sceneBox = $("#sceneBox");
     const slug = (n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, "");
     let sceneToken = 0;
     const imgOk = {}; // remembers which picture files exist
@@ -266,31 +266,19 @@
       const base = `assets/story/${sceneKey}`;
       const chapterBase = `assets/story/${slug(viewer)}-ch${ch + 1}`; // one picture for the whole chapter
       const portrait = (charOf(speaker) || {}).photo;
-      const drawn = window.StoryScenes && StoryScenes.has(sceneKey);
-      // a drawn scene marked "force" beats the chapter-wide picture (e.g. a different place)
-      const useChapterPic = !(drawn && StoryScenes.forced && StoryScenes.forced(sceneKey));
       const tries = [pic && { src: pic, kind: "full" },
                      { src: base + ".png", kind: "full" }, { src: base + ".jpg", kind: "full" },
-                     useChapterPic && { src: chapterBase + ".png", kind: "full" }, useChapterPic && { src: chapterBase + ".jpg", kind: "full" },
-                     !drawn && portrait && { src: portrait, kind: "portrait" }].filter(Boolean)
+                     { src: chapterBase + ".png", kind: "full" }, { src: chapterBase + ".jpg", kind: "full" },
+                     portrait && { src: portrait, kind: "portrait" }].filter(Boolean)
                     .filter((t) => imgOk[t.src] !== false);
-      const known = tries.find((t) => imgOk[t.src] === true);
-      const showEmoji = () => { photo.hidden = true; stage.hidden = true; emojiEl.hidden = false; sceneBox.classList.remove("has-full"); };
-      const showDrawn = () => {
-        photo.hidden = true; emojiEl.hidden = true; stage.hidden = false;
-        sceneBox.classList.add("has-full");
-        StoryScenes.render(stage, sceneKey);
-      };
-      // show the drawn scene right away unless we already know a real picture exists
-      if (drawn && !known) showDrawn(); else if (!drawn) stage.hidden = true;
+      const showEmoji = () => { photo.hidden = true; emojiEl.hidden = false; sceneBox.classList.remove("has-full"); };
       const attempt = (i) => {
         if (token !== sceneToken) return;
-        if (i >= tries.length) return drawn ? null : showEmoji();
+        if (i >= tries.length) return showEmoji();
         const t = tries[i], img = new Image();
         img.onload = () => {
           imgOk[t.src] = true;
           if (token !== sceneToken) return;
-          stage.hidden = true; stage.innerHTML = "";
           photo.src = t.src; photo.className = "scene-photo " + t.kind;
           photo.alt = t.kind === "portrait" ? speaker : `${speaker}: ${part(ch).lines[line][1]}`;
           photo.hidden = false; emojiEl.hidden = true;

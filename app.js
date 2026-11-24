@@ -50,13 +50,13 @@
   else { $("#startBtn").addEventListener("click", start); window.addEventListener("keydown", start); }
 
   /* ================= ROUTER ================= */
-  const screens = ["home", "story", "wedding", "travel", "rsvp"];
+  const screens = ["home", "story", "gallery", "wedding", "travel", "rsvp"];
   function show(name) {
     if (!screens.includes(name)) name = "home";
     $$(".screen").forEach((s) => (s.hidden = s.dataset.screen !== name));
     $$(".topnav a").forEach((a) => a.classList.toggle("active", a.dataset.go === name));
     document.body.classList.toggle("sub", name !== "home");
-    document.title = name === "home" ? "Chin-Yi & Sixuan" : `${$(`#screen-${name} h2`).textContent.replace(/^\S+\s/, "")} · Chin-Yi & Sixuan`;
+    document.title = name === "home" ? "Chin-Yi & Sixuan" : `${$(`#screen-${name} h2`).textContent.trim()} · Chin-Yi & Sixuan`;
     window.scrollTo({ top: 0 });
     if (name === "story") story.enter();
   }
@@ -71,6 +71,7 @@
   });
   window.addEventListener("popstate", () => show(location.hash.slice(1)));
   window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !$("#lightbox").hidden) return;
     if (e.key === "Escape" && document.body.classList.contains("sub")) { history.pushState(null, "", "#home"); show("home"); }
   });
 
@@ -388,6 +389,48 @@
     });
     let entered = false;
     return { view, enter: () => { if (!entered) { entered = true; view(viewer); } } };
+  })();
+
+  /* ================= GALLERY (real photos in wooden frames) ================= */
+  (function gallery() {
+    const photos = (CFG.gallery || []).filter((p) => p && p.src);
+    const album = $("#album"), lb = $("#lightbox");
+    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
+    const meta = (p) => [p.place, p.year].filter(Boolean).join(" · ");
+    if (!photos.length) {
+      $("#albumHint").hidden = true;
+      album.innerHTML = Array.from({ length: 6 }, (_, i) =>
+        `<figure class="photo-card empty" style="--tilt:${[-1.5, 1, -.5, 1.5, -1, .5][i]}deg"><div class="photo-frame"><span class="pxi pxi-camera"></span></div>` +
+        `<figcaption><b>Photo coming soon</b></figcaption></figure>`).join("");
+      return;
+    }
+    album.innerHTML = photos.map((p, i) =>
+      `<figure class="photo-card" style="--tilt:${[-1.5, 1, -.5, 1.5, -1, .5][i % 6]}deg">` +
+      `<button class="photo-frame" data-i="${i}" aria-label="Open photo: ${esc(p.caption || "photo " + (i + 1))}">` +
+      `<img src="${esc(p.src)}" alt="${esc(p.caption || "")}" loading="lazy" /></button>` +
+      `<figcaption><b>${esc(p.caption || "")}</b>${meta(p) ? `<span>${esc(meta(p))}</span>` : ""}</figcaption></figure>`).join("");
+    let cur = 0, opener = null;
+    function open(i) {
+      cur = (i + photos.length) % photos.length;
+      const p = photos[cur];
+      $("#lbImg").src = p.src; $("#lbImg").alt = p.caption || "";
+      $("#lbCap").textContent = p.caption || ""; $("#lbMeta").textContent = meta(p);
+      lb.hidden = false; document.body.classList.add("lb-open");
+      $("#lbPrev").hidden = $("#lbNext").hidden = photos.length < 2;
+      $("#lbClose").focus();
+    }
+    function close() { lb.hidden = true; document.body.classList.remove("lb-open"); if (opener) opener.focus(); }
+    album.addEventListener("click", (e) => { const b = e.target.closest(".photo-frame[data-i]"); if (!b) return; opener = b; sfx.select(); open(+b.dataset.i); });
+    $("#lbPrev").addEventListener("click", () => { sfx.blip(); open(cur - 1); });
+    $("#lbNext").addEventListener("click", () => { sfx.blip(); open(cur + 1); });
+    $("#lbClose").addEventListener("click", close);
+    lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
+    window.addEventListener("keydown", (e) => {
+      if (lb.hidden) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") open(cur - 1);
+      else if (e.key === "ArrowRight") open(cur + 1);
+    });
   })();
 
   /* ================= TRAVEL MAP ================= */

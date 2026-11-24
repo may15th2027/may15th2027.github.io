@@ -31,6 +31,13 @@ window.WEDDING_CONFIG = {
     },
   ],
 
+  // ---- Gallery (real photos) ----
+  // Put the photo files in web/assets/gallery/ and list them here, in the order to show.
+  // caption = the title under the photo; place / year are optional.
+  // Example: { src: "assets/gallery/teton.jpg", caption: "Grand Teton trip", place: "Wyoming", year: "2024" },
+  gallery: [
+  ],
+
   // ---- Our Story: the same moments, each told in 3 versions (Chin-Yi / Sixuan / Leia) ----
   // Imported from "Story Worksheet.xlsx" (one row per sentence). Each line is
   // [speaker, text, picture (or null), place shown in the badge for that sentence].

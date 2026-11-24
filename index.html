@@ -31,11 +31,12 @@
 
   <!-- ============ TOP NAV (sub-screens) ============ -->
   <nav class="topnav" id="topnav" aria-label="Main">
-    <a href="#home"  data-go="home"><span class="ico">🏠</span>Home</a>
-    <a href="#story" data-go="story"><span class="ico">❤</span>Our Story</a>
-    <a href="#wedding" data-go="wedding"><span class="ico">💍</span>Wedding</a>
-    <a href="#travel" data-go="travel"><span class="ico">🗺</span>Travel</a>
-    <a href="#rsvp"  data-go="rsvp"><span class="ico">✉</span>RSVP</a>
+    <a href="#home"    data-go="home"><span class="ico pxi pxi-home"></span>Home</a>
+    <a href="#story"   data-go="story"><span class="ico pxi pxi-heart"></span>Our Story</a>
+    <a href="#gallery" data-go="gallery"><span class="ico pxi pxi-camera"></span>Gallery</a>
+    <a href="#wedding" data-go="wedding"><span class="ico pxi pxi-ring"></span>Wedding</a>
+    <a href="#travel"  data-go="travel"><span class="ico pxi pxi-map"></span>Travel</a>
+    <a href="#rsvp"    data-go="rsvp"><span class="ico pxi pxi-mail"></span>RSVP</a>
   </nav>
 
   <main>
@@ -54,11 +55,12 @@
 
           <!-- left signpost menu -->
           <nav class="signpost" aria-label="Menu">
-            <a href="#home"    data-go="home"    class="plank is-home"><span class="ico">🏠</span>Home</a>
-            <a href="#story"   data-go="story"   class="plank"><span class="ico">❤️</span>Our Story</a>
-            <a href="#wedding" data-go="wedding" class="plank"><span class="ico">💍</span>Wedding</a>
-            <a href="#travel"  data-go="travel"  class="plank"><span class="ico">🗺️</span>Travel</a>
-            <a href="#rsvp"    data-go="rsvp"    class="plank"><span class="ico">✉️</span>RSVP</a>
+            <a href="#home"    data-go="home"    class="plank is-home"><span class="ico pxi pxi-home"></span>Home</a>
+            <a href="#story"   data-go="story"   class="plank"><span class="ico pxi pxi-heart"></span>Our Story</a>
+            <a href="#gallery" data-go="gallery" class="plank"><span class="ico pxi pxi-camera"></span>Gallery</a>
+            <a href="#wedding" data-go="wedding" class="plank"><span class="ico pxi pxi-ring"></span>Wedding</a>
+            <a href="#travel"  data-go="travel"  class="plank"><span class="ico pxi pxi-map"></span>Travel</a>
+            <a href="#rsvp"    data-go="rsvp"    class="plank"><span class="ico pxi pxi-mail"></span>RSVP</a>
           </nav>
 
           <!-- right "Big Day" board -->
@@ -74,8 +76,8 @@
 
           <!-- bottom buttons -->
           <div class="cta">
-            <a href="#story" data-go="story" class="cta-btn"><span class="ico">❤️</span>Read Our Story <b>›</b></a>
-            <a href="#rsvp"  data-go="rsvp"  class="cta-btn cta-pink"><span class="ico">✉️</span>RSVP <b>›</b></a>
+            <a href="#story" data-go="story" class="cta-btn"><span class="ico pxi pxi-heart"></span>Read Our Story <b>›</b></a>
+            <a href="#rsvp"  data-go="rsvp"  class="cta-btn cta-pink"><span class="ico pxi pxi-mail"></span>RSVP <b>›</b></a>
           </div>
         </div>
       </div>
@@ -95,7 +97,7 @@
 
     <!-- ================= OUR STORY ================= -->
     <section id="screen-story" class="screen" data-screen="story" hidden>
-      <header class="sign"><h2>❤ Our Story</h2><p>Meet the players</p></header>
+      <header class="sign"><h2><span class="pxi pxi-heart"></span> Our Story</h2><p>Meet the players</p></header>
 
       <h3 class="section-label center">— Choose your character —</h3>
       <div class="party" id="party"></div>
@@ -126,9 +128,26 @@
       </div>
     </section>
 
+    <!-- ================= GALLERY ================= -->
+    <section id="screen-gallery" class="screen" data-screen="gallery" hidden>
+      <header class="sign"><h2><span class="pxi pxi-camera"></span> Gallery</h2><p>Our photo album</p></header>
+      <div class="album" id="album"></div>
+      <p class="hint" id="albumHint">Tap a photo to see it bigger</p>
+    </section>
+
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo" hidden>
+      <figure class="lb-frame parchment">
+        <img id="lbImg" alt="" />
+        <figcaption><b id="lbCap"></b><span id="lbMeta"></span></figcaption>
+      </figure>
+      <button class="btn lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">◀</button>
+      <button class="btn lb-btn lb-next" id="lbNext" aria-label="Next photo">▶</button>
+      <button class="btn lb-btn lb-close" id="lbClose" aria-label="Close">✕</button>
+    </div>
+
     <!-- ================= WEDDING ================= -->
     <section id="screen-wedding" class="screen" data-screen="wedding" hidden>
-      <header class="sign"><h2>💍 The Big Day</h2><p>Main quest</p></header>
+      <header class="sign"><h2><span class="pxi pxi-ring"></span> The Big Day</h2><p>Main quest</p></header>
 
       <div class="grid-2">
         <div class="panel parchment">
@@ -167,7 +186,7 @@
 
     <!-- ================= TRAVEL ================= -->
     <section id="screen-travel" class="screen" data-screen="travel" hidden>
-      <header class="sign"><h2>🗺 Travel</h2><p>World map &amp; inventory</p></header>
+      <header class="sign"><h2><span class="pxi pxi-map"></span> Travel</h2><p>World map &amp; inventory</p></header>
 
       <div class="map panel">
         <div class="map-area">
@@ -218,7 +237,7 @@
 
     <!-- ================= RSVP ================= -->
     <section id="screen-rsvp" class="screen" data-screen="rsvp" hidden>
-      <header class="sign"><h2>✉ RSVP</h2><p>Join the party! Please reply by Mar 1, 2027</p></header>
+      <header class="sign"><h2><span class="pxi pxi-mail"></span> RSVP</h2><p>Join the party! Please reply by Mar 1, 2027</p></header>
 
       <form id="rsvpForm" class="panel parchment rsvp" novalidate>
         <div class="xp">

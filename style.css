@@ -217,11 +217,6 @@ body:not(.sub) .topnav { display: none; }
   background: linear-gradient(#fff1d2, #fbe0ac);
   box-shadow: 0 0 0 .5cqw #b9773a, 0 0 0 calc(.5cqw + 3px) #4a2a12, inset 0 0 0 3px #f0c98b, 0 1cqw 0 .6cqw rgba(0,0,0,.3);
 }
-.bigday::before, .bigday::after { /* ropes */
-  content: ""; position: absolute; top: -7cqw; width: .5cqw; height: 6.4cqw;
-  background: repeating-linear-gradient(#c79a5c 0 6px, #8d6233 6px 10px);
-}
-.bigday::before { left: 18%; } .bigday::after { right: 18%; }
 .bd-title { text-align: center; font-weight: 700; font-size: 1.25em; padding-bottom: .4em; border-bottom: 3px dashed #d9a95e; margin-bottom: .5em; }
 .bd-list { list-style: none; margin: 0 0 .8em; padding: 0; }
 .bd-list li { display: flex; align-items: center; gap: .6em; padding: .3em 0; font-weight: 600; }
@@ -248,6 +243,9 @@ body:not(.sub) .topnav { display: none; }
 .petals { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .petal { position: absolute; top: -10px; width: 8px; height: 8px; background: #ffc4d6; box-shadow: 4px 4px 0 #f59ab8;
   animation: fall linear infinite; opacity: .9; }
+.petal { transition: background-color .35s, box-shadow .35s; }
+/* night cherry blossoms: used while the title screen shows the night picture (.hero-art.night) */
+.petal-night, .hero-art.night .petal { background: #970404; box-shadow: 4px 4px 0 #f59ab8; }
 @keyframes fall {
   to { transform: translate(var(--drift, 120px), 105vh) rotate(360deg); }
 }
@@ -264,7 +262,6 @@ body:not(.sub) .topnav { display: none; }
   .speech.show { transform: translate(-50%, -100%) scale(1); }
   .bigday { position: relative; inset: auto; width: auto; margin: 40px 20px 0; padding: 18px 20px 20px; font-size: 19px;
     box-shadow: 0 0 0 5px #b9773a, 0 0 0 8px #4a2a12, inset 0 0 0 3px #f0c98b, 0 10px 0 4px rgba(0,0,0,.3); }
-  .bigday::before, .bigday::after { top: -36px; width: 6px; height: 28px; }
   .cta { position: static; transform: none; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 30px 20px 0; font-size: 18px; }
   .cta-btn { min-width: 0; padding: 14px 12px; }
 }
@@ -779,3 +776,8 @@ body.lb-open { overflow: hidden; }
   .vn .dialog.wide-portrait { padding-left: 124px; }
   .vn .dialog.wide-portrait .nameplate { left: 122px; }
 }
+/* title screen: night version shown while the mouse button is held on the artwork (PC) */
+.hero-night { position: absolute; inset: 0; opacity: 0; transition: opacity .35s; pointer-events: none; }
+.hero-art.night .hero-night { opacity: 1; }
+/* phones: holding a finger on the art shouldn't select it or pop up "save image" */
+.hero-art { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }

@@ -1,8 +1,8 @@
 // ===== 16-bit hard-rock background music, generated live with the Web Audio API =====
 // An ORIGINAL track ("Quest Accepted"): galloping power-chord riff, punchy bass, rock drums,
 // a soaring lead and a big "HEY!" bridge. 16 bars (about 29 s) that loop.
-// window.BGM.play(audioContext) starts it, window.BGM.stop() fades it out.
-// (The previous gentle loop is kept in music-gentle.js — swap the <script> in index.html to use it.)
+// Plays while the title screen is at NIGHT. window.BGM_NIGHT.play(ctx) starts it (always from the
+// full-band part, bar 5), window.BGM_NIGHT.stop() fades it out. The day music is in music-day.js.
 (() => {
   const BPM = 132;
   const STEP = 60 / BPM / 4;          // one 16th note, in seconds
@@ -160,7 +160,7 @@
     if (c.state === "suspended") c.resume();
     out.master.gain.cancelScheduledValues(c.currentTime);
     out.master.gain.setTargetAtTime(VOLUME, c.currentTime, 0.3);
-    nextTime = c.currentTime + 0.1; step = 0;
+    nextTime = c.currentTime + 0.05; step = 4 * 16; // jump straight in at the full band
     timer = setInterval(tick, 25); tick();
   }
   function stop() {
@@ -169,5 +169,5 @@
     out.master.gain.cancelScheduledValues(ctx.currentTime);
     out.master.gain.setTargetAtTime(0, ctx.currentTime, 0.15);
   }
-  window.BGM = { play, stop, get playing() { return !!timer; } };
+  window.BGM_NIGHT = { play, stop, get playing() { return !!timer; } };
 })();

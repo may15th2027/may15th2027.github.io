@@ -32,16 +32,26 @@
   const soundBtn = $("#soundBtn");
   const paintSound = () => (soundBtn.textContent = soundOn ? "♪ ON" : "♪ OFF");
   paintSound();
-  // background music (music.js): needs a click/key first, because browsers block sound until then
+  // background music: day = warm melodic (music-day.js), night = hard rock (music-night.js).
+  // Needs a click/key first, because browsers block sound until then.
   function audio() {
     try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch {}
     return actx;
   }
-  function music() { if (!window.BGM) return; if (soundOn && !document.hidden) BGM.play(audio()); else BGM.stop(); }
+  let nightMode = false;
+  function music() {
+    const day = window.BGM_DAY, night = window.BGM_NIGHT;
+    if (!day || !night) return;
+    const on = soundOn && !document.hidden;
+    const want = nightMode ? night : day, other = nightMode ? day : night;
+    other.stop();                        // short fade out...
+    if (on) want.play(audio()); else want.stop(); // ...while the other one fades in
+  }
+  function setNight(v) { if (nightMode === v) return; nightMode = v; if (window.BGM_DAY && (BGM_DAY.playing || BGM_NIGHT.playing)) music(); }
   const firstGesture = () => { music(); window.removeEventListener("pointerdown", firstGesture); window.removeEventListener("keydown", firstGesture); };
   window.addEventListener("pointerdown", firstGesture);
   window.addEventListener("keydown", firstGesture);
-  document.addEventListener("visibilitychange", () => { if (window.BGM && (BGM.playing || !document.hidden)) music(); });
+  document.addEventListener("visibilitychange", () => { if (window.BGM_DAY && (BGM_DAY.playing || BGM_NIGHT.playing || !document.hidden)) music(); });
   soundBtn.addEventListener("click", () => { soundOn = !soundOn; store.set("sound", soundOn); paintSound(); sfx.blip(); music(); });
 
   /* ================= BOOT ================= */
@@ -86,6 +96,22 @@
   });
 
   /* ================= TITLE SCREEN ================= */
+  // Hold the mouse button (PC) or keep a finger on the artwork (phone) to see it at night; let go to go back to day
+  (() => {
+    const art = $(".hero-art");
+    const day = () => { art.classList.remove("night"); setNight(false); };
+    art.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (e.target.closest("a, button, .speech")) return; // clicks on the cat / mailbox still work as before
+      e.preventDefault(); // no image drag or text selection while holding
+      art.classList.add("night"); setNight(true);
+    });
+    window.addEventListener("pointerup", day);
+    window.addEventListener("pointercancel", day);
+    art.addEventListener("contextmenu", (e) => { if (!e.target.closest("a, button")) e.preventDefault(); }); // long-press menu on phones
+    window.addEventListener("blur", day);
+  })();
+
   // falling cherry blossom petals
   const petals = $(".petals");
   for (let i = 0; i < 22; i++) {

@@ -37,7 +37,7 @@
     ["Your question", "你的問題", "你的问题"],
     ["Send", "送出", "发送"],
     ["Hi! 👋 Got a question about the wedding? Ask us anything!", "嗨！👋 對婚禮有什麼問題嗎？儘管問我們！", "嗨！👋 对婚礼有什么问题吗？尽管问我们！"],
-    ["This doesn't work.", "這個功能不能用。", "这个功能不能用。"],
+    ["You’ll have to figure it out yourself! 🤷‍♀️ All I can tell you is… try pressing the home page background. 🌙✨", "你得自己想辦法囉！🤷‍♀️ 我只能告訴你……試著按住首頁的背景看看。🌙✨", "你得自己想办法啰！🤷‍♀️ 我只能告诉你……试着按住首页的背景看看。🌙✨"],
 
     // menus
     ["Main", "主選單", "主菜单"],
@@ -349,6 +349,25 @@
     ["Hmm, the carrier pigeon got lost. Please try again!", "嗯……信鴿迷路了，請再試一次！", "嗯……信鸽迷路了，请再试一次！"],
     ["Your RSVP is in. We can't wait to celebrate with you at Duke Chapel on May 15, 2027! ♥", "已收到你的回覆！2027年5月15日杜克教堂見，迫不及待要和你一起慶祝！♥", "已收到你的回复！2027年5月15日杜克教堂见，迫不及待要和你一起庆祝！♥"],
     ["We'll miss you dearly, but thank you for letting us know. Sending love! 💌", "我們會非常想你，謝謝你告訴我們。送上滿滿的愛！💌", "我们会非常想你，谢谢你告诉我们。送上满满的爱！💌"],
+
+    // message board + photo comments
+    ["Forum", "留言板", "留言板"],
+    ["Leave us a note!", "留言給我們！", "留言给我们！"],
+    ["Your name", "你的名字", "你的名字"],
+    ["Your message", "你的留言", "你的留言"],
+    ["📌 Pin it!", "📌 貼上去！", "📌 贴上去！"],
+    ["Preview mode: messages are only saved in this browser until the Google Sheet is connected.", "預覽模式：連上 Google 試算表之前，留言只會存在這個瀏覽器裡。", "预览模式：连上 Google 表格之前，留言只会保存在这个浏览器里。"],
+    ["Loading messages…", "留言載入中…", "留言加载中…"],
+    ["No messages yet — be the first to leave one! 💌", "還沒有留言——來當第一個吧！💌", "还没有留言——来当第一个吧！💌"],
+    ["Comments", "留言", "留言"],
+    ["💬 Comments", "💬 留言", "💬 留言"],
+    ["Say something about this photo...", "對這張照片說點什麼……", "对这张照片说点什么……"],
+    ["Your comment", "你的留言", "你的留言"],
+    ["Post", "送出", "发送"],
+    ["Loading comments…", "留言載入中…", "留言加载中…"],
+    ["No comments yet — say something nice! 💬", "還沒有留言——說點好話吧！💬", "还没有留言——说点好话吧！💬"],
+    ["Please write a message.", "請寫點留言。", "请写点留言。"],
+    ["Slow down a little — try again in a few seconds!", "慢一點——過幾秒再試一次！", "慢一点——过几秒再试一次！"],
   ];
 
   // ---------- text with formatting inside (bold, links...): translated as a whole ----------

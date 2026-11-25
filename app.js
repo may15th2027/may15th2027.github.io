@@ -54,7 +54,7 @@
   window.addEventListener("pointerdown", firstGesture);
   window.addEventListener("keydown", firstGesture);
   document.addEventListener("visibilitychange", () => { if (window.BGM_DAY && (BGM_DAY.playing || BGM_NIGHT.playing || !document.hidden)) music(); });
-  /* ================= CHAT (a joke: whatever you ask, it answers "This doesn't work.") ================= */
+  /* ================= CHAT (a joke: whatever you ask, it answers with a hint about the secret night view) ================= */
   (() => {
     const btn = $("#chatBtn"), box = $("#chatBox"), log = $("#chatLog"), form = $("#chatForm"), input = $("#chatInput");
     const say = (who, text) => {
@@ -77,7 +77,7 @@
       const q = input.value.trim(); if (!q) return;
       say("me", q); input.value = ""; sfx.type();
       const dots = say("bot typing", "…");
-      setTimeout(() => { dots.remove(); say("bot", "This doesn't work."); sfx.blip(); }, 700 + Math.random() * 500);
+      setTimeout(() => { dots.remove(); say("bot", "You’ll have to figure it out yourself! 🤷‍♀️ All I can tell you is… try pressing the home page background. 🌙✨"); sfx.blip(); }, 700 + Math.random() * 500);
     });
   })();
 
@@ -99,7 +99,7 @@
   else { $("#startBtn").addEventListener("click", start); window.addEventListener("keydown", start); }
 
   /* ================= ROUTER ================= */
-  const screens = ["home", "story", "gallery", "wedding", "travel", "rsvp"];
+  const screens = ["home", "story", "gallery", "board", "wedding", "travel", "rsvp"];
   let current = "home";
   function setTitle() {
     const names = t("Chin-Yi & Sixuan");
@@ -114,6 +114,7 @@
     window.scrollTo({ top: 0 });
     if (name === "story") story.enter();
     if (name === "gallery") gallery.shelf(); // the Gallery tab always opens on the album shelf
+    if (name === "board") board.enter();
   }
   document.addEventListener("click", (e) => {
     const a = e.target.closest("[data-go]");
@@ -493,6 +494,93 @@
     return { view, relang, enter: () => { if (!entered) { entered = true; view(viewer); } } };
   })();
 
+  /* ================= GUEST MESSAGES (Forum + comments under gallery photos) ================= */
+  // Saved to the Google Sheet by the same Apps Script as the RSVPs (config.js → rsvpEndpoint), which also
+  // sends them back so every visitor sees them. Without it (testing), they're kept in this browser only.
+  const notes = (() => {
+    const API = CFG.messagesEndpoint || CFG.rsvpEndpoint;
+    const MINE = "notes-mine";
+    let data = null, loading = null;
+    const subs = [];
+    const emit = () => subs.forEach((f) => f(data));
+    function load() {
+      if (loading) return loading;
+      loading = (async () => {
+        let d = { messages: [], comments: [] };
+        if (API) {
+          try {
+            const j = await (await fetch(API + (API.includes("?") ? "&" : "?") + "action=notes", { cache: "no-store" })).json();
+            if (j && j.ok) d = { messages: j.messages || [], comments: j.comments || [] };
+          } catch (e) {}
+        }
+        // my own posts: always shown to me (in preview mode they live only here; online, until the sheet has them)
+        const keep = API ? 60 * 60 * 1000 : Infinity;
+        const mine = store.get(MINE, []).filter((x) => Date.now() - Date.parse(x.time) < keep);
+        store.set(MINE, mine);
+        for (const x of mine) {
+          const list = x.kind === "comment" ? d.comments : d.messages;
+          if (!list.some((y) => y.id === x.id)) list.push(x);
+        }
+        data = d; emit(); return d;
+      })();
+      return loading;
+    }
+    async function post(kind, fields) {
+      const x = { kind, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), time: new Date().toISOString(), ...fields };
+      if (API) await fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(x) });
+      store.set(MINE, [...store.get(MINE, []), x].slice(-100));
+      await load();
+      const list = kind === "comment" ? data.comments : data.messages;
+      if (!list.some((y) => y.id === x.id)) list.push(x);
+      emit();
+    }
+    const locale = () => ({ "zh-Hant": "zh-TW", "zh-Hans": "zh-CN" }[window.I18N && I18N.lang] || "en-US");
+    const date = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString(locale(), { year: "numeric", month: "short", day: "numeric" }); };
+    // the name + message form (board and photo comments share it)
+    let last = 0;
+    function wire(form, kind, extra, max) {
+      const err = $("[data-note-err]", form), count = $(".note-count", form), btn = $("button[type=submit]", form);
+      const nameIn = form.elements.name, textIn = form.elements.text;
+      nameIn.value = store.get("guest-name", "");
+      if (count) textIn.addEventListener("input", () => (count.textContent = `${textIn.value.length}/${max}`));
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = nameIn.value.trim(), text = textIn.value.trim();
+        err.textContent = !name ? "Please enter your name." : !text ? "Please write a message." : Date.now() - last < 15000 ? "Slow down a little — try again in a few seconds!" : "";
+        if (err.textContent) { sfx.error(); return; }
+        btn.disabled = true;
+        try {
+          await post(kind, { name, text, website: form.elements.website.value, ...extra() });
+          last = Date.now(); store.set("guest-name", name);
+          textIn.value = ""; if (count) count.textContent = `0/${max}`;
+          sfx.select();
+        } catch (ex) { err.textContent = "Hmm, the carrier pigeon got lost. Please try again!"; sfx.error(); }
+        finally { btn.disabled = false; }
+      });
+    }
+    $$("[data-notes-local]").forEach((x) => (x.hidden = !!API));
+    return { load, post, wire, date, on: (f) => subs.push(f), get data() { return data; } };
+  })();
+
+  /* ================= MESSAGE BOARD ================= */
+  const board = (() => {
+    const wall = $("#noteWall");
+    const tilt = (i) => [-2, 1.5, -1, 2, -1.5, 1][i % 6];
+    const colors = ["#fff3dc", "#ffe1ea", "#e3f3ff", "#eaf7dc", "#fff0c4"];
+    function render(d) {
+      if (!d) { wall.innerHTML = `<p class="note-empty">Loading messages…</p>`; return; }
+      const list = [...d.messages].sort((a, b) => Date.parse(b.time) - Date.parse(a.time));
+      wall.innerHTML = list.length ? list.map((m, i) =>
+        `<article class="note-card" style="--tilt:${tilt(i)}deg;--paper:${colors[i % colors.length]}">` +
+        `<p class="note-text" data-no-i18n>${esc(m.text)}</p>` +
+        `<footer><b data-no-i18n>— ${esc(m.name)}</b><time data-no-i18n>${esc(notes.date(m.time))}</time></footer></article>`).join("")
+        : `<p class="note-empty">No messages yet — be the first to leave one! 💌</p>`;
+    }
+    notes.on(render);
+    notes.wire($("#boardForm"), "message", () => ({}), 500);
+    return { enter: () => { render(notes.data); notes.load(); }, render: () => render(notes.data) };
+  })();
+
   /* ================= GALLERY (albums of real photos in wooden frames) ================= */
   // Album shelf -> click an album -> its photos -> click a photo -> lightbox.
   const gallery = (() => {
@@ -526,7 +614,7 @@
         // folder "Leia-The boss of the house" -> album "Leia", note "The boss of the house"
         title: name.split("-")[0].trim() || name,
         note: name.includes("-") ? name.slice(name.indexOf("-") + 1).trim() : "",
-        photos: by[name].sort(natural).map((p) => ({ src: url(ROOT + p), caption: p.split("/").pop().replace(IMG, "") })),
+        photos: by[name].sort(natural).map((p) => ({ src: url(ROOT + p), key: p, caption: p.split("/").pop().replace(IMG, "") })),
       }));
     }
     // local preview server (VS Code Live Server, python -m http.server...): read the folder listings
@@ -602,12 +690,14 @@
         `<figure class="photo-card" style="--tilt:${tilt(j)}deg">` +
         `<button class="photo-frame" data-i="${j}" aria-label="Open photo: ${esc(p.caption || "photo " + (j + 1))}">` +
         `<img src="${esc(p.src)}" alt="${esc(p.caption || "")}" loading="lazy"${focus(p.focus)} /></button>` +
-        `<figcaption><b>${esc(p.caption || "")}</b>${meta(p) ? `<span>${esc(meta(p))}</span>` : ""}</figcaption></figure>`).join("")
+        `<figcaption><b>${esc(p.caption || "")}</b>${meta(p) ? `<span>${esc(meta(p))}</span>` : ""}` +
+        `<span class="photo-talk" data-talk="${esc(p.key)}" data-no-i18n hidden></span></figcaption></figure>`).join("")
         : Array.from({ length: 3 }, (_, j) =>
         `<figure class="photo-card empty" style="--tilt:${tilt(j)}deg"><div class="photo-frame"><span class="pxi pxi-camera"></span></div>` +
         `<figcaption><b>Photo coming soon</b></figcaption></figure>`).join("");
       shelfEl.hidden = true; viewEl.hidden = false;
       hint.hidden = !photos.length; hint.textContent = "Tap a photo to see it bigger";
+      paintTalk(); notes.load();
       $("#screen-gallery").scrollIntoView({ block: "start" });
       $("#albumBack").focus({ preventScroll: true });
     }
@@ -626,7 +716,28 @@
       lb.hidden = false; document.body.classList.add("lb-open");
       $("#lbPrev").hidden = $("#lbNext").hidden = photos.length < 2;
       $("#lbClose").focus();
+      renderComments(); notes.load();
     }
+    // comments under the open photo, and the 💬 count on each photo card
+    const commentsOf = (key) => ((notes.data && notes.data.comments) || []).filter((c) => c.photo === key)
+      .sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
+    function renderComments() {
+      if (lb.hidden || !photos[cur]) return;
+      const list = commentsOf(photos[cur].key);
+      $("#lbList").innerHTML = !notes.data ? `<li class="lb-empty">Loading comments…</li>`
+        : list.length ? list.map((c) => `<li><b data-no-i18n>${esc(c.name)}</b><time data-no-i18n>${esc(notes.date(c.time))}</time>` +
+          `<p data-no-i18n>${esc(c.text)}</p></li>`).join("")
+        : `<li class="lb-empty">No comments yet — say something nice! 💬</li>`;
+      $("#lbList").scrollTop = $("#lbList").scrollHeight;
+    }
+    function paintTalk() {
+      $$("[data-talk]", album).forEach((x) => {
+        const n = commentsOf(x.dataset.talk).length;
+        x.hidden = !n; x.textContent = `💬 ${n}`;
+      });
+    }
+    notes.on(() => { renderComments(); paintTalk(); });
+    notes.wire($("#lbForm"), "comment", () => ({ photo: photos[cur].key }), 300);
     function close() { lb.hidden = true; document.body.classList.remove("lb-open"); if (opener) opener.focus(); }
     album.addEventListener("click", (e) => { const b = e.target.closest(".photo-frame[data-i]"); if (!b) return; opener = b; sfx.select(); open(+b.dataset.i); });
     $("#lbPrev").addEventListener("click", () => { sfx.blip(); open(cur - 1); });
@@ -635,6 +746,7 @@
     lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
     window.addEventListener("keydown", (e) => {
       if (!lb.hidden) {
+        if (e.key !== "Escape" && e.target.closest && e.target.closest("input, textarea")) return; // typing a comment
         if (e.key === "Escape") close();
         else if (e.key === "ArrowLeft") open(cur - 1);
         else if (e.key === "ArrowRight") open(cur + 1);
@@ -642,7 +754,7 @@
       }
       if (e.key === "Escape" && !$("#screen-gallery").hidden && !viewEl.hidden) { sfx.blip(); shelf(); }
     });
-    return { shelf };
+    return { shelf, relang: () => { renderComments(); } };
   })();
 
   /* ================= TRAVEL MAP ================= */
@@ -789,6 +901,6 @@
   go(1);
 
   /* ================= INIT ================= */
-  document.addEventListener("langchange", () => { setTitle(); story.relang(); });
+  document.addEventListener("langchange", () => { setTitle(); story.relang(); board.render(); gallery.relang(); });
   show(location.hash.slice(1) || "home");
 })();

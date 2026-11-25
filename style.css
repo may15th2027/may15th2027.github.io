@@ -807,3 +807,59 @@ html:lang(zh-Hans) { --font: "Pixelify Sans", "VT323", "Microsoft YaHei", "PingF
   --font-read: "Nunito", "Microsoft YaHei", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; }
 .chat-box { bottom: 182px; }
 @media (max-width: 700px) { .chat-box { bottom: 178px; } }
+
+/* ===== Message Board: pinned paper notes + photo comments in the photo viewer ===== */
+.pxi-note { background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'><rect x='6' y='0' width='3' height='1' fill='%233b1f0c'/><rect x='5' y='1' width='1' height='1' fill='%233b1f0c'/><rect x='6' y='1' width='1' height='1' fill='%23e8505b'/><rect x='7' y='1' width='1' height='1' fill='%23ffb3b8'/><rect x='8' y='1' width='1' height='1' fill='%23e8505b'/><rect x='9' y='1' width='1' height='1' fill='%233b1f0c'/><rect x='5' y='2' width='1' height='1' fill='%233b1f0c'/><rect x='6' y='2' width='2' height='1' fill='%23e8505b'/><rect x='8' y='2' width='1' height='1' fill='%23b8333f'/><rect x='9' y='2' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='3' width='12' height='1' fill='%233b1f0c'/><rect x='2' y='4' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='4' width='4' height='1' fill='%23fff3dc'/><rect x='7' y='4' width='1' height='1' fill='%233b1f0c'/><rect x='8' y='4' width='5' height='1' fill='%23fff3dc'/><rect x='13' y='4' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='5' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='5' width='1' height='1' fill='%23fff3dc'/><rect x='4' y='5' width='7' height='1' fill='%23b98b5a'/><rect x='11' y='5' width='2' height='1' fill='%23fff3dc'/><rect x='13' y='5' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='6' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='6' width='10' height='1' fill='%23fff3dc'/><rect x='13' y='6' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='7' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='7' width='1' height='1' fill='%23fff3dc'/><rect x='4' y='7' width='8' height='1' fill='%23b98b5a'/><rect x='12' y='7' width='1' height='1' fill='%23fff3dc'/><rect x='13' y='7' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='8' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='8' width='10' height='1' fill='%23fff3dc'/><rect x='13' y='8' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='9' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='9' width='1' height='1' fill='%23fff3dc'/><rect x='4' y='9' width='5' height='1' fill='%23b98b5a'/><rect x='9' y='9' width='4' height='1' fill='%23fff3dc'/><rect x='13' y='9' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='10' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='10' width='10' height='1' fill='%23fff3dc'/><rect x='13' y='10' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='11' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='11' width='1' height='1' fill='%23fff3dc'/><rect x='4' y='11' width='7' height='1' fill='%23b98b5a'/><rect x='11' y='11' width='2' height='1' fill='%23fff3dc'/><rect x='13' y='11' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='12' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='12' width='8' height='1' fill='%23fff3dc'/><rect x='11' y='12' width='2' height='1' fill='%23e9cf9c'/><rect x='13' y='12' width='1' height='1' fill='%233b1f0c'/><rect x='2' y='13' width='1' height='1' fill='%233b1f0c'/><rect x='3' y='13' width='7' height='1' fill='%23fff3dc'/><rect x='10' y='13' width='1' height='1' fill='%23e9cf9c'/><rect x='11' y='13' width='2' height='1' fill='%233b1f0c'/><rect x='2' y='14' width='10' height='1' fill='%233b1f0c'/></svg>"); }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; } /* hidden spam-bot trap */
+.note-form { max-width: 720px; margin: 0 auto 34px; display: grid; gap: 12px; }
+.note-form label { display: grid; gap: 4px; font-weight: 700; }
+.note-form input, .note-form textarea, .lb-form input, .lb-form textarea {
+  width: 100%; font: 700 16px var(--font-read); padding: 9px 11px; border: 3px solid var(--wood-dark); background: #fffaf0; color: var(--ink); resize: vertical; }
+.note-form input:focus, .note-form textarea:focus, .lb-form input:focus, .lb-form textarea:focus { outline: 3px dashed var(--pink-dark); outline-offset: 1px; }
+.note-form-row { display: flex; align-items: center; gap: 12px; }
+.note-form-row .err { flex: 1; margin: 0; }
+.note-count { font: 700 13px var(--font-read); opacity: .6; }
+.note-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 34px 26px; padding: 10px 6px; align-items: start; }
+.note-card {
+  position: relative; margin: 0; padding: 22px 18px 14px; background: var(--paper, #fff3dc); color: var(--ink);
+  transform: rotate(var(--tilt, 0deg)); transition: transform .15s;
+  box-shadow: 0 0 0 3px var(--wood-dark), 0 10px 0 rgba(0,0,0,.22);
+}
+.note-card::before { /* pixel pin */
+  content: ""; position: absolute; top: -9px; left: 50%; width: 16px; height: 16px; transform: translateX(-50%);
+  background: var(--pink); box-shadow: 0 0 0 3px var(--ink), inset 3px 3px 0 var(--pink-hi), inset -3px -3px 0 var(--pink-dark);
+}
+.note-card:hover { transform: rotate(0deg) translateY(-4px); }
+.note-text { margin: 0 0 12px; font: 700 17px/1.5 var(--font-read); white-space: pre-wrap; overflow-wrap: anywhere; }
+.note-card footer { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; border-top: 2px dashed rgba(90,52,24,.3); padding-top: 8px; }
+.note-card footer b { font: 600 17px var(--font); overflow-wrap: anywhere; }
+.note-card footer time { font: 700 12px var(--font-read); opacity: .6; white-space: nowrap; }
+.note-empty { grid-column: 1 / -1; text-align: center; font: 600 20px var(--font); color: var(--parch); text-shadow: 2px 2px 0 var(--wood-dark); }
+
+/* photo viewer: picture on the left, comments on the right (stacked on phones) */
+.lb-frame { flex-direction: row; gap: 18px; align-items: stretch; max-width: min(1240px, 100%); max-height: calc(100vh - 48px); }
+.lb-photo { margin: 0; display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+.lb-photo img { max-width: 100%; max-height: calc(100vh - 150px); object-fit: contain; margin: 0 auto; box-shadow: 0 0 0 4px var(--wood-dark); image-rendering: auto; }
+.lb-photo figcaption { text-align: center; padding-top: 12px; }
+.lb-photo figcaption b { display: block; font: 600 22px var(--font); }
+.lb-photo figcaption span { font: 700 15px var(--font-read); opacity: .7; }
+.lb-comments { flex: 0 0 300px; display: flex; flex-direction: column; min-height: 0; max-height: calc(100vh - 80px); border-left: 3px dashed rgba(90,52,24,.35); padding-left: 16px; }
+.lb-comments h4 { margin: 0 0 8px; font: 600 19px var(--font); }
+.lb-list { list-style: none; margin: 0 0 10px; padding: 0 4px 0 0; flex: 1 1 auto; min-height: 60px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.lb-list li { background: #fffaf0; padding: 8px 10px; box-shadow: 0 0 0 2px var(--wood); }
+.lb-list li b { font: 600 15px var(--font); margin-right: 8px; }
+.lb-list li time { font: 700 11px var(--font-read); opacity: .6; }
+.lb-list li p { margin: 4px 0 0; font: 700 14px/1.4 var(--font-read); white-space: pre-wrap; overflow-wrap: anywhere; }
+.lb-list li.lb-empty { background: none; box-shadow: none; font: 700 14px var(--font-read); opacity: .7; padding: 4px 0; }
+.lb-form { display: grid; gap: 6px; }
+.lb-form input, .lb-form textarea { font-size: 14px; padding: 7px 9px; }
+.lb-form .btn { padding: 8px 16px; font-size: 16px; }
+.photo-talk { display: inline-block; margin-top: 4px; font: 700 13px var(--font-read); opacity: .75; }
+.photo-talk[hidden] { display: none; }
+@media (max-width: 820px) {
+  .lb-frame { flex-direction: column; overflow-y: auto; }
+  .lb-photo img { max-height: 55vh; }
+  .lb-comments { flex: none; max-height: none; border-left: 0; padding-left: 0; border-top: 3px dashed rgba(90,52,24,.35); padding-top: 12px; }
+  .lb-list { max-height: 30vh; }
+}
+@media (max-width: 520px) { .note-wall { grid-template-columns: 1fr; } }

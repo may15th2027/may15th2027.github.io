@@ -31,7 +31,7 @@
     <button id="soundBtn" class="hud-btn" aria-label="Toggle sound" title="Sound">♪ ON</button>
   </div>
 
-  <!-- ============ CHAT (always answers "This doesn't work.") ============ -->
+  <!-- ============ CHAT (always answers with the same hint) ============ -->
   <section class="chat-box parchment" id="chatBox" role="dialog" aria-label="Chat" hidden>
     <header class="chat-head"><span class="pxi pxi-chat"></span> Ask us anything!<button type="button" class="chat-close" id="chatClose" aria-label="Close chat">✕</button></header>
     <div class="chat-log" id="chatLog" aria-live="polite"></div>
@@ -46,6 +46,7 @@
     <a href="#home"    data-go="home"><span class="ico pxi pxi-home"></span>Home</a>
     <a href="#story"   data-go="story"><span class="ico pxi pxi-heart"></span>Our Story</a>
     <a href="#gallery" data-go="gallery"><span class="ico pxi pxi-camera"></span>Gallery</a>
+    <a href="#board"   data-go="board"><span class="ico pxi pxi-note"></span>Forum</a>
     <a href="#wedding" data-go="wedding"><span class="ico pxi pxi-ring"></span>Wedding</a>
     <a href="#travel"  data-go="travel"><span class="ico pxi pxi-map"></span>Travel</a>
     <a href="#rsvp"    data-go="rsvp"><span class="ico pxi pxi-mail"></span>RSVP</a>
@@ -71,6 +72,7 @@
             <a href="#home"    data-go="home"    class="plank is-home"><span class="ico pxi pxi-home"></span>Home</a>
             <a href="#story"   data-go="story"   class="plank"><span class="ico pxi pxi-heart"></span>Our Story</a>
             <a href="#gallery" data-go="gallery" class="plank"><span class="ico pxi pxi-camera"></span>Gallery</a>
+            <a href="#board"   data-go="board"   class="plank"><span class="ico pxi pxi-note"></span>Forum</a>
             <a href="#wedding" data-go="wedding" class="plank"><span class="ico pxi pxi-ring"></span>Wedding</a>
             <a href="#travel"  data-go="travel"  class="plank"><span class="ico pxi pxi-map"></span>Travel</a>
             <a href="#rsvp"    data-go="rsvp"    class="plank"><span class="ico pxi pxi-mail"></span>RSVP</a>
@@ -155,11 +157,43 @@
       <p class="hint" id="albumHint">Pick an album</p>
     </section>
 
+    <!-- ================= MESSAGE BOARD ================= -->
+    <section id="screen-board" class="screen" data-screen="board" hidden>
+      <header class="sign"><h2><span class="pxi pxi-note"></span> Forum</h2><p>Leave us a note!</p></header>
+      <form class="panel parchment note-form" id="boardForm" autocomplete="off" novalidate>
+        <label>Your name<input name="name" maxlength="40" placeholder="e.g. Taylor Lin" /></label>
+        <label>Your message<textarea name="text" rows="3" maxlength="500" placeholder="Write something sweet..."></textarea></label>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <div class="note-form-row">
+          <span class="err" data-note-err></span>
+          <span class="note-count" data-no-i18n>0/500</span>
+          <button type="submit" class="btn btn-pink">📌 Pin it!</button>
+        </div>
+      </form>
+      <p class="hint" data-notes-local hidden>Preview mode: messages are only saved in this browser until the Google Sheet is connected.</p>
+      <div class="note-wall" id="noteWall"></div>
+    </section>
+
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo" hidden>
-      <figure class="lb-frame parchment">
-        <img id="lbImg" alt="" />
-        <figcaption><b id="lbCap"></b><span id="lbMeta"></span></figcaption>
-      </figure>
+      <div class="lb-frame parchment">
+        <figure class="lb-photo">
+          <img id="lbImg" alt="" />
+          <figcaption><b id="lbCap"></b><span id="lbMeta"></span></figcaption>
+        </figure>
+        <aside class="lb-comments" aria-label="Comments">
+          <h4>💬 Comments</h4>
+          <ol class="lb-list" id="lbList"></ol>
+          <form class="lb-form" id="lbForm" autocomplete="off" novalidate>
+            <input name="name" maxlength="40" placeholder="Your name" aria-label="Your name" />
+            <textarea name="text" rows="2" maxlength="300" placeholder="Say something about this photo..." aria-label="Your comment"></textarea>
+            <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <div class="note-form-row">
+              <span class="err" data-note-err></span>
+              <button type="submit" class="btn btn-pink">Post</button>
+            </div>
+          </form>
+        </aside>
+      </div>
       <button class="btn lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">◀</button>
       <button class="btn lb-btn lb-next" id="lbNext" aria-label="Next photo">▶</button>
       <button class="btn lb-btn lb-close" id="lbClose" aria-label="Close">✕</button>

@@ -52,6 +52,32 @@
   window.addEventListener("pointerdown", firstGesture);
   window.addEventListener("keydown", firstGesture);
   document.addEventListener("visibilitychange", () => { if (window.BGM_DAY && (BGM_DAY.playing || BGM_NIGHT.playing || !document.hidden)) music(); });
+  /* ================= CHAT (a joke: whatever you ask, it answers "This doesn't work.") ================= */
+  (() => {
+    const btn = $("#chatBtn"), box = $("#chatBox"), log = $("#chatLog"), form = $("#chatForm"), input = $("#chatInput");
+    const say = (who, text) => {
+      const m = document.createElement("p");
+      m.className = "chat-msg " + who; m.textContent = text;
+      log.appendChild(m); log.scrollTop = log.scrollHeight;
+      return m;
+    };
+    say("bot", "Hi! 👋 Got a question about the wedding? Ask us anything!");
+    const open = (v) => {
+      box.hidden = !v; btn.setAttribute("aria-expanded", v); btn.classList.toggle("on", v);
+      if (v) input.focus(); else btn.focus();
+    };
+    btn.addEventListener("click", () => { sfx.blip(); open(box.hidden); });
+    $("#chatClose").addEventListener("click", () => { sfx.blip(); open(false); });
+    window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !box.hidden) { e.stopImmediatePropagation(); open(false); } }, true);
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = input.value.trim(); if (!q) return;
+      say("me", q); input.value = ""; sfx.type();
+      const dots = say("bot typing", "…");
+      setTimeout(() => { dots.remove(); say("bot", "This doesn't work."); sfx.blip(); }, 700 + Math.random() * 500);
+    });
+  })();
+
   soundBtn.addEventListener("click", () => { soundOn = !soundOn; store.set("sound", soundOn); paintSound(); sfx.blip(); music(); });
 
   /* ================= BOOT ================= */

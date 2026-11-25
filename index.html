@@ -162,7 +162,7 @@
     <section id="screen-board" class="screen" data-screen="board" hidden>
       <header class="sign"><h2><span class="pxi pxi-note"></span> Forum</h2><p>Leave us a note!</p></header>
       <form class="panel parchment note-form" id="boardForm" autocomplete="off" novalidate>
-        <label>Your name<input name="name" maxlength="40" placeholder="e.g. Taylor Lin" /></label>
+        <label>Your name<input name="name" maxlength="40" placeholder="e.g. Leia Dang" /></label>
         <label>Your message<textarea name="text" rows="3" maxlength="500" placeholder="Write something sweet..."></textarea></label>
         <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <div class="note-form-row">
@@ -171,7 +171,7 @@
           <button type="submit" class="btn btn-pink">📌 Pin it!</button>
         </div>
       </form>
-      <p class="hint" data-notes-local hidden>Preview mode: messages are only saved in this browser until the Google Sheet is connected.</p>
+      <p class="hint" data-notes-local hidden>Preview mode: the Forum isn't connected to the Google Sheet yet (config.js → rsvpEndpoint).</p>
       <div class="note-wall" id="noteWall"></div>
     </section>
 
@@ -304,7 +304,7 @@
         <!-- Step 1 -->
         <fieldset class="step" data-step="1">
           <legend>Player 1 — who are you?</legend>
-          <label>Full name<input name="name" required autocomplete="name" placeholder="e.g. Taylor Lin" /></label>
+          <label>Full name<input name="name" required autocomplete="name" placeholder="e.g. Leia Dang" /></label>
           <label>Email<input name="email" type="email" required autocomplete="email" placeholder="you@example.com" /></label>
           <div class="err" data-err="1"></div>
         </fieldset>

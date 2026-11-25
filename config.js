@@ -14,21 +14,22 @@ window.WEDDING_CONFIG = {
   // ---- Character cards (top of "Our Story") ----
   // stats = the six RPG stats on the hexagon chart, each 1–10:
   //   STR strength · DEX dexterity · CON constitution · INT intelligence · WIS wisdom · CHA charisma
+  // ig = Instagram handle (e.g. "leia_the_little_princess"); leave "" to hide the IG line.
   // Clicking a card retells the SAME story from that character's point of view.
   characters: [
     {
       name: "Chin-Yi", emoji: "👩", photo: "assets/chinyi.png", tag: "P1",
-      className: "Chemist", origin: "Yilan, Taiwan", skill: "Spontaneous",
+      className: "Chemist", origin: "Yilan, Taiwan", skill: "Spontaneous", ig: "pinkpig0720",
       stats: { STR: 7, DEX: 7, CON: 9, INT: 9, WIS: 6, CHA: 10 },
     },
     {
       name: "Sixuan", emoji: "👨", photo: "assets/sixuan.png", tag: "P2",
-      className: "Computer Scientist", origin: "Chunhua, China", skill: "Overthinking",
+      className: "Computer Scientist", origin: "Chunhua, China", skill: "Overthinking", ig: "nickdang1019",
       stats: { STR: 10, DEX: 7, CON: 9, INT: 9, WIS: 6, CHA: 9 },
     },
     {
       name: "Leia", emoji: "🐱", photo: "assets/leia.png", tag: "P3", nameIcon: "🐾",
-      className: "Boss", origin: "State College, USA", skill: "Having affair with DK and Square",
+      className: "Boss", origin: "State College, USA", skill: "Having affair with DK and Square", ig: "leia_the_little_princess",
       stats: { STR: 5, DEX: 10, CON: 6, INT: 3, WIS: 10, CHA: 10 },
     },
   ],

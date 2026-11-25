@@ -131,9 +131,16 @@
 
     <!-- ================= GALLERY ================= -->
     <section id="screen-gallery" class="screen" data-screen="gallery" hidden>
-      <header class="sign"><h2><span class="pxi pxi-camera"></span> Gallery</h2><p>Our photo album</p></header>
-      <div class="album" id="album"></div>
-      <p class="hint" id="albumHint">Tap a photo to see it bigger</p>
+      <header class="sign"><h2><span class="pxi pxi-camera"></span> Gallery</h2><p>Our photo albums</p></header>
+      <div class="album-shelf" id="albumShelf"></div>
+      <div class="album-view" id="albumView" hidden>
+        <div class="album-head">
+          <button type="button" class="btn album-back" id="albumBack">◀ All albums</button>
+          <div class="album-name"><h3 id="albumTitle"></h3><p id="albumNote"></p></div>
+        </div>
+        <div class="album" id="album"></div>
+      </div>
+      <p class="hint" id="albumHint">Pick an album</p>
     </section>
 
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo" hidden>

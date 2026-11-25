@@ -647,7 +647,8 @@ h1, h2, h3, h4, button, .btn, .cta-btn, .topnav, .sign, .plank, .section-label, 
   display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; border: 0; cursor: var(--cur-click); overflow: hidden;
   background: var(--wood-dark); box-shadow: inset 0 0 0 4px var(--wood-dark);
 }
-.photo-frame img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+.photo-frame { position: relative; }
+.photo-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
 .photo-frame:focus-visible { outline: 3px dashed var(--pink-dark); outline-offset: 4px; }
 .photo-card figcaption { padding: 10px 4px 0; text-align: center; line-height: 1.25; }
 .photo-card figcaption b { display: block; font: 600 19px var(--font); }
@@ -722,3 +723,44 @@ input:not([type="radio"]):not([type="checkbox"]), textarea { cursor: text; }
   .vn .dialog-back { bottom: auto; top: -18px; right: 12px; padding: 3px 10px; font-size: 14px; border-radius: 6px;
     box-shadow: 0 0 0 3px #c98a4b, 0 0 0 5px #5a3418; }
 }
+
+/* ===== gallery albums: a shelf of scrapbooks (cover photo with pages stacked behind) ===== */
+.album-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 44px 34px; padding: 14px 10px 10px; }
+.album-shelf[hidden], .album-view[hidden] { display: none; }
+.album-card {
+  position: relative; z-index: 0; display: flex; flex-direction: column; align-items: stretch; width: 100%;
+  padding: 14px 14px 12px; border: 0; background: none; color: var(--ink); text-align: center; cursor: var(--cur-click);
+  transform: rotate(var(--tilt, 0deg)); transition: transform .15s;
+}
+/* the cover paper, plus two more pages peeking out behind it (all behind the card's content) */
+.album-paper, .album-card::before, .album-card::after { content: ""; position: absolute; inset: 0; box-shadow: 0 0 0 4px var(--wood-dark); }
+.album-paper { z-index: -1; background: var(--parch);
+  box-shadow: 0 0 0 4px var(--wood-dark), inset 0 0 0 4px var(--wood), inset 0 0 0 8px var(--wood-hi), 0 12px 0 rgba(0,0,0,.25); }
+.album-card::before { z-index: -2; background: #f3dfb3; transform: rotate(4deg) translate(6px, 2px); }
+.album-card::after { z-index: -3; background: #e9cd96; transform: rotate(-3.5deg) translate(-6px, 4px); }
+.album-card:hover, .album-card:focus-visible { transform: rotate(0deg) translateY(-5px); outline: none; }
+.album-card:focus-visible .album-paper { box-shadow: 0 0 0 4px var(--pink-dark), inset 0 0 0 4px var(--wood), inset 0 0 0 8px var(--wood-hi), 0 12px 0 rgba(0,0,0,.25); }
+.album-cover {
+  display: grid; place-items: center; aspect-ratio: 4 / 3; overflow: hidden;
+  background: var(--wood-dark); box-shadow: inset 0 0 0 4px var(--wood-dark);
+}
+.album-cover { position: relative; }
+.album-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+.album-card.empty .album-cover { background: repeating-linear-gradient(45deg, #ead3a0 0 10px, #e2c58c 10px 20px); box-shadow: inset 0 0 0 4px var(--wood); }
+.album-card.empty .album-cover .pxi { width: 64px; height: 64px; opacity: .55; }
+.album-title { display: block; margin-top: 10px; font: 600 21px var(--font); }
+.album-note { display: block; margin-top: 3px; font: 700 14px var(--font-read); opacity: .7; }
+
+/* inside an album: "◀ All albums" + the album name, then its photos */
+.album-head { display: flex; align-items: center; gap: 18px; margin: 4px 6px 30px; flex-wrap: wrap; }
+.album-back { padding: 10px 16px; font-size: 17px; }
+.album-name h3 { margin: 0; font: 600 26px var(--font); color: var(--parch); text-shadow: 2px 2px 0 var(--wood-dark); }
+.album-name p { margin: 2px 0 0; font: 700 15px var(--font-read); color: var(--parch); opacity: .85; text-shadow: 1px 1px 0 var(--wood-dark); }
+@media (max-width: 520px) {
+  .album-shelf { grid-template-columns: 1fr 1fr; gap: 30px 20px; padding: 10px 6px; }
+  .album-card { padding: 9px 9px 8px; }
+  .album-title { font-size: 17px; margin-top: 7px; }
+  .album-note { font-size: 12px; }
+  .album-card.empty .album-cover .pxi { width: 40px; height: 40px; }
+}
+.album-loading { grid-column: 1 / -1; text-align: center; font: 600 20px var(--font); color: var(--parch); text-shadow: 2px 2px 0 var(--wood-dark); }

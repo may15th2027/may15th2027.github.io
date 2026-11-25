@@ -31,12 +31,15 @@ window.WEDDING_CONFIG = {
     },
   ],
 
-  // ---- Gallery (real photos) ----
-  // Put the photo files in web/assets/gallery/ and list them here, in the order to show.
-  // caption = the title under the photo; place / year are optional.
-  // Example: { src: "assets/gallery/teton.jpg", caption: "Grand Teton trip", place: "Wyoming", year: "2024" },
-  gallery: [
-  ],
+  // ---- Gallery (real photos, in albums) ----
+  // Nothing to list here: the gallery reads the folders by itself.
+  //   web/assets/gallery/<Album name>-<Note>/<Photo caption>.jpg   (the "-<Note>" part is optional)
+  // Each folder is an album: the name before the first "-" is the album name, the rest is the
+  // short note under it ("Leia-The boss of the house"). Each photo's file name (without .jpg)
+  // is its caption. Albums and photos are sorted by name; start a name with a number
+  // ("1 Our Trips", "2 Leia") to choose the order. The first photo is the album cover.
+  // On the live site the list comes from GitHub, so new photos show once they're pushed.
+  galleryRepo: { repo: "may15th2027/may15th2027.github.io", branch: "master" },
 
   // ---- Our Story: the same moments, each told in 3 versions (Chin-Yi / Sixuan / Leia) ----
   // Imported from "Story Worksheet.xlsx" (one row per sentence). Each line is

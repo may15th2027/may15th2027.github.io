@@ -79,6 +79,7 @@
     document.title = name === "home" ? "Chin-Yi & Sixuan" : `${$(`#screen-${name} h2`).textContent.trim()} · Chin-Yi & Sixuan`;
     window.scrollTo({ top: 0 });
     if (name === "story") story.enter();
+    if (name === "gallery") gallery.shelf(); // the Gallery tab always opens on the album shelf
   }
   document.addEventListener("click", (e) => {
     const a = e.target.closest("[data-go]");
@@ -92,6 +93,7 @@
   window.addEventListener("popstate", () => show(location.hash.slice(1)));
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !$("#lightbox").hidden) return;
+    if (e.key === "Escape" && !$("#screen-gallery").hidden && !$("#albumView").hidden) return; // gallery: Esc = back to albums
     if (e.key === "Escape" && document.body.classList.contains("sub")) { history.pushState(null, "", "#home"); show("home"); }
   });
 
@@ -304,12 +306,12 @@
       const c = charOf(name);
       box.classList.toggle("narrator", !c);
       box.classList.remove("cutout");
-      // both of us speaking ("Chin-Yi & Sixuan") -> the two-of-us picture; end of the story -> the-end.png.
-      // Both are landscape pictures, so the portrait box (and the text beside it) gets wider.
-      const couple = name === "__end" ? "assets/narrator/the-end.png"
-        : !c && namesIn(name).length > 1 ? "assets/narrator/sixuan-and-chinyi.png" : null;
-      // "🔓 Unlocked!" message -> unlocked.png (normal size, not landscape)
-      const special = couple || (name.startsWith("🔓") ? "assets/narrator/unlocked.png" : null);
+      // both of us speaking ("Chin-Yi & Sixuan") -> the two-of-us picture.
+      // It's a landscape picture, so the portrait box (and the text beside it) gets wider.
+      const couple = !c && namesIn(name).length > 1 ? "assets/narrator/sixuan-and-chinyi.png" : null;
+      // "🔓 Unlocked!" -> unlocked.png, end of the story -> the-end.png (both normal size, not landscape)
+      const special = couple || (name === "__end" ? "assets/narrator/the-end.png"
+        : name.startsWith("🔓") ? "assets/narrator/unlocked.png" : null);
       box.classList.toggle("wide", !!couple);
       $("#dialog").classList.toggle("wide-portrait", !!couple);
       box.innerHTML = c ? `<img src="${esc(c.photo)}" alt="">` : special ? `<img src="${special}" alt="">` : "💞";
@@ -441,25 +443,131 @@
     return { view, enter: () => { if (!entered) { entered = true; view(viewer); } } };
   })();
 
-  /* ================= GALLERY (real photos in wooden frames) ================= */
-  (function gallery() {
-    const photos = (CFG.gallery || []).filter((p) => p && p.src);
-    const album = $("#album"), lb = $("#lightbox");
+  /* ================= GALLERY (albums of real photos in wooden frames) ================= */
+  // Album shelf -> click an album -> its photos -> click a photo -> lightbox.
+  const gallery = (() => {
+    // Albums come straight from the folders: assets/gallery/<album name>/<photo caption>.jpg
+    // Nothing to list by hand. Folder name = album name, file name (without .jpg) = caption.
+    // Where to look: on a local preview server, the folder listing itself; on the live site,
+    // GitHub's file list for the repository (a website can't list its own folders).
+    const ROOT = "assets/gallery/";
+    const IMG = /\.(jpe?g|png|gif|webp|avif)$/i; // (iPhone .heic photos only open in Safari, so save them as .jpg)
+    const GH = CFG.galleryRepo || { repo: "may15th2027/may15th2027.github.io", branch: "master" };
+    let albums = [];
+    const shelfEl = $("#albumShelf"), viewEl = $("#albumView"), album = $("#album"), lb = $("#lightbox"), hint = $("#albumHint");
     const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
     const meta = (p) => [p.place, p.year].filter(Boolean).join(" · ");
-    if (!photos.length) {
-      $("#albumHint").hidden = true;
-      album.innerHTML = Array.from({ length: 6 }, (_, i) =>
-        `<figure class="photo-card empty" style="--tilt:${[-1.5, 1, -.5, 1.5, -1, .5][i]}deg"><div class="photo-frame"><span class="pxi pxi-camera"></span></div>` +
-        `<figcaption><b>Photo coming soon</b></figcaption></figure>`).join("");
-      return;
+    const tilt = (i) => [-1.5, 1, -.5, 1.5, -1, .5][i % 6];
+    const focus = (f) => f ? ` style="object-position:${esc(f)}"` : "";
+    const count = (n) => n ? `${n} photo${n > 1 ? "s" : ""}` : "Photos coming soon";
+    const natural = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
+    const url = (path) => path.split("/").map(encodeURIComponent).join("/");
+    let photos = [], cur = 0, opener = null, lastAlbum = null;
+
+    // ["Our Trips/beach day.jpg", ...] (paths inside assets/gallery/) -> albums
+    function toAlbums(paths) {
+      const by = {};
+      paths.forEach((p) => {
+        const parts = p.split("/");
+        if (parts.length < 2 || !IMG.test(p)) return; // photos must be inside an album folder
+        (by[parts[0]] = by[parts[0]] || []).push(p);
+      });
+      return Object.keys(by).sort(natural).map((name) => ({
+        // folder "Leia-The boss of the house" -> album "Leia", note "The boss of the house"
+        title: name.split("-")[0].trim() || name,
+        note: name.includes("-") ? name.slice(name.indexOf("-") + 1).trim() : "",
+        photos: by[name].sort(natural).map((p) => ({ src: url(ROOT + p), caption: p.split("/").pop().replace(IMG, "") })),
+      }));
     }
-    album.innerHTML = photos.map((p, i) =>
-      `<figure class="photo-card" style="--tilt:${[-1.5, 1, -.5, 1.5, -1, .5][i % 6]}deg">` +
-      `<button class="photo-frame" data-i="${i}" aria-label="Open photo: ${esc(p.caption || "photo " + (i + 1))}">` +
-      `<img src="${esc(p.src)}" alt="${esc(p.caption || "")}" loading="lazy" /></button>` +
-      `<figcaption><b>${esc(p.caption || "")}</b>${meta(p) ? `<span>${esc(meta(p))}</span>` : ""}</figcaption></figure>`).join("");
-    let cur = 0, opener = null;
+    // local preview server (VS Code Live Server, python -m http.server...): read the folder listings
+    async function fromListing(dir = "", depth = 0) {
+      const res = await fetch(url(ROOT + dir), { cache: "no-store" });
+      if (!res.ok || !/html/i.test(res.headers.get("content-type") || "")) throw Error("no listing");
+      const base = new URL(url(ROOT + dir), location.href).pathname.replace(/\/?$/, "/");
+      const doc = new DOMParser().parseFromString(await res.text(), "text/html");
+      const names = new Set();
+      $$("a[href]", doc).forEach((a) => {
+        const path = new URL(a.getAttribute("href"), new URL(base, location.href)).pathname;
+        if (!path.startsWith(base) || path === base) return;
+        const name = decodeURIComponent(path.slice(base.length)).replace(/\/$/, "");
+        if (name && !name.includes("/") && !name.startsWith(".")) names.add(name);
+      });
+      if (!names.size && depth === 0) throw Error("empty listing");
+      const out = [];
+      for (const n of names) {
+        if (IMG.test(n)) out.push(dir + n);
+        else if (depth < 3) out.push(...await fromListing(dir + n + "/", depth + 1).catch(() => []));
+      }
+      return out;
+    }
+    // live site: one request to GitHub for the whole file list (cached for this visit)
+    async function fromGitHub() {
+      const key = "gallery:" + GH.repo + "@" + GH.branch;
+      try { const c = JSON.parse(sessionStorage.getItem(key)); if (c && Date.now() - c.t < 6e5) return c.paths; } catch (e) {}
+      const res = await fetch(`https://api.github.com/repos/${GH.repo}/git/trees/${encodeURIComponent(GH.branch)}?recursive=1`);
+      if (!res.ok) throw Error("GitHub " + res.status);
+      const paths = (await res.json()).tree.filter((t) => t.type === "blob" && t.path.startsWith(ROOT)).map((t) => t.path.slice(ROOT.length));
+      try { sessionStorage.setItem(key, JSON.stringify({ t: Date.now(), paths })); } catch (e) {}
+      return paths;
+    }
+    const isLocal = /^(localhost|127\.|192\.168\.|10\.|\[::1\])/.test(location.hostname);
+    async function load() {
+      const tries = location.protocol === "file:" ? [fromGitHub] : isLocal ? [fromListing, fromGitHub] : [fromGitHub, fromListing];
+      for (const t of tries) { try { const a = toAlbums(await t()); if (a.length) return a; } catch (e) {} }
+      return [];
+    }
+
+    // the shelf: one scrapbook per album (cover = its first photo, title, photo count)
+    function renderShelf() {
+      if (!albums.length) {
+        shelfEl.innerHTML = `<div class="album-card empty" style="--tilt:-1deg"><span class="album-paper"></span>` +
+          `<span class="album-cover"><span class="pxi pxi-camera"></span></span>` +
+          `<span class="album-title">Photos coming soon</span><span class="album-note">Check back later!</span></div>`;
+        hint.hidden = true; return;
+      }
+      shelfEl.innerHTML = albums.map((a, i) => {
+        const cover = a.photos[0] && a.photos[0].src;
+        return `<button type="button" class="album-card${cover ? "" : " empty"}" data-a="${i}" style="--tilt:${tilt(i)}deg" aria-label="Open album: ${esc(a.title)}">` +
+          `<span class="album-paper"></span><span class="album-cover">${cover ? `<img src="${esc(cover)}" alt="" loading="lazy" />` : `<span class="pxi pxi-camera"></span>`}</span>` +
+          `<span class="album-title">${esc(a.title)}</span>` +
+          `<span class="album-note">${a.note ? esc(a.note) + " · " : ""}${count(a.photos.length)}</span></button>`;
+      }).join("");
+      if (viewEl.hidden) hint.hidden = false;
+    }
+    shelfEl.innerHTML = `<p class="album-loading">Loading albums…</p>`; hint.hidden = true;
+    load().then((a) => { albums = a; renderShelf(); });
+
+    function shelf() {
+      lb.hidden = true; document.body.classList.remove("lb-open");
+      viewEl.hidden = true; shelfEl.hidden = false;
+      hint.hidden = !albums.length; hint.textContent = "Pick an album";
+      if (lastAlbum) { lastAlbum.focus({ preventScroll: true }); lastAlbum = null; }
+    }
+    function openAlbum(i) {
+      const a = albums[i];
+      photos = a.photos;
+      $("#albumTitle").textContent = a.title || "Album";
+      $("#albumNote").textContent = [a.note, count(photos.length)].filter(Boolean).join(" · ");
+      album.innerHTML = photos.length ? photos.map((p, j) =>
+        `<figure class="photo-card" style="--tilt:${tilt(j)}deg">` +
+        `<button class="photo-frame" data-i="${j}" aria-label="Open photo: ${esc(p.caption || "photo " + (j + 1))}">` +
+        `<img src="${esc(p.src)}" alt="${esc(p.caption || "")}" loading="lazy"${focus(p.focus)} /></button>` +
+        `<figcaption><b>${esc(p.caption || "")}</b>${meta(p) ? `<span>${esc(meta(p))}</span>` : ""}</figcaption></figure>`).join("")
+        : Array.from({ length: 3 }, (_, j) =>
+        `<figure class="photo-card empty" style="--tilt:${tilt(j)}deg"><div class="photo-frame"><span class="pxi pxi-camera"></span></div>` +
+        `<figcaption><b>Photo coming soon</b></figcaption></figure>`).join("");
+      shelfEl.hidden = true; viewEl.hidden = false;
+      hint.hidden = !photos.length; hint.textContent = "Tap a photo to see it bigger";
+      $("#screen-gallery").scrollIntoView({ block: "start" });
+      $("#albumBack").focus({ preventScroll: true });
+    }
+    shelfEl.addEventListener("click", (e) => {
+      const b = e.target.closest(".album-card[data-a]"); if (!b) return;
+      lastAlbum = b; sfx.select(); openAlbum(+b.dataset.a);
+    });
+    $("#albumBack").addEventListener("click", () => { sfx.blip(); shelf(); });
+
+    // lightbox (arrows move within the open album)
     function open(i) {
       cur = (i + photos.length) % photos.length;
       const p = photos[cur];
@@ -476,11 +584,15 @@
     $("#lbClose").addEventListener("click", close);
     lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
     window.addEventListener("keydown", (e) => {
-      if (lb.hidden) return;
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowLeft") open(cur - 1);
-      else if (e.key === "ArrowRight") open(cur + 1);
+      if (!lb.hidden) {
+        if (e.key === "Escape") close();
+        else if (e.key === "ArrowLeft") open(cur - 1);
+        else if (e.key === "ArrowRight") open(cur + 1);
+        return;
+      }
+      if (e.key === "Escape" && !$("#screen-gallery").hidden && !viewEl.hidden) { sfx.blip(); shelf(); }
     });
+    return { shelf };
   })();
 
   /* ================= TRAVEL MAP ================= */

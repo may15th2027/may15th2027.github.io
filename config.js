@@ -25,7 +25,7 @@ window.WEDDING_CONFIG = {
     {
       name: "Sixuan", emoji: "👨", photo: "assets/sixuan.png", tag: "P2",
       className: "Computer Scientist", origin: "Chunhua, China", skill: "Overthinking", ig: "nickdang1019",
-      stats: { STR: 10, DEX: 7, CON: 9, INT: 9, WIS: 6, CHA: 9 },
+      stats: { STR: 10, DEX: 7, CON: 9, INT: 9, WIS: 6, CHA: 8 },
     },
     {
       name: "Leia", emoji: "🐱", photo: "assets/leia.png", tag: "P3", nameIcon: "🐾",

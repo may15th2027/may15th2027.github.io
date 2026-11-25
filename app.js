@@ -167,16 +167,25 @@
     p.style.width = p.style.height = s + "px";
     petals.appendChild(p);
   }
-  // cat easter egg
+  // click Leia, Chin-Yi or Sixuan on the title picture: they say something (one speech bubble, moved over whoever talks)
   const catSpeech = $("#catSpeech");
-  const catLines = ["Meow! I'm Leia. Did you RSVP yet? 🐾", "Purrr... see you May 15! 💕", "*knocks your phone off the table*", "Mrrp! I'm the ring bearer. 💍"];
-  let catI = 0, catT;
-  $("#catBtn").addEventListener("click", () => {
-    sfx.meow();
-    catSpeech.textContent = catLines[catI++ % catLines.length];
+  const TALK = {
+    // sx / sy = where the bubble sits (% of the picture), tx = which way it grows, msx = bubble spot on phones
+    leia: { sx: "50%", sy: "66%", tx: "-10%", msx: "56%", lines: [" Meow! I'm Leia. Did you bring my treats? 🐾", "Purrr... try clicking the background for a surprise! 💕", "*knocks your phone off the table*", "Mrrp! I'm the ring bearer. 💍"] },
+    chinyi: { sx: "46%", sy: "60%", tx: "-90%", msx: "44%", lines: ["Hi! I'm Chin-Yi. Welcome to our adventure! 💕", "I just adopted a cat! 🐱", "HSixuan has bought 4 old cars...🙄", "...and he keeps forgetting about his Mazda 6! 🚗"] },
+    sixuan: { sx: "51.5%", sy: "59%", tx: "-10%", msx: "52%", lines: ["Hey! I'm Sixuan. Welcome! 👋", "You thought the Miata was my last car? 🏎️", "Then I bought a Ranger... 🛻", "...and then I got a 1995 Jeep! 🚙"] },
+  };
+  const talkI = {};
+  let catT;
+  $$("[data-talk-who]").forEach((b) => b.addEventListener("click", () => {
+    const who = b.dataset.talkWho, w = TALK[who];
+    if (who === "leia") sfx.meow(); else sfx.select();
+    ["sx", "sy", "tx", "msx"].forEach((k) => catSpeech.style.setProperty("--" + k, w[k]));
+    talkI[who] = talkI[who] || 0;
+    catSpeech.textContent = w.lines[talkI[who]++ % w.lines.length];
     catSpeech.classList.add("show");
     clearTimeout(catT); catT = setTimeout(() => catSpeech.classList.remove("show"), 2600);
-  });
+  }));
 
   // countdown
   const target = new Date(CFG.weddingDate).getTime();
@@ -193,7 +202,7 @@
   /* ================= CHARACTER CARDS ================= */
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const party = $("#party");
-  // six RPG stats (1–10) drawn as a hexagon chart; hover / long-press a stat for what it means
+  // six RPG stats (1–10) drawn as a hexagon chart; hover (or tap) a stat for what it means
   const STATS = [
     ["STR", "Strength (STR) — body & drive: fitness, stamina for hard work, getting things done."],
     ["DEX", "Dexterity (DEX) — quick hands & reflexes: coordination, thinking on your feet, efficiency."],
@@ -211,7 +220,7 @@
     const labels = STATS.map(([k, tip], i) => {
       const [x, y] = pt(i, R + 20), anchor = Math.abs(x) < 5 ? "middle" : x > 0 ? "start" : "end";
       const [dx, dy] = pt(i, (R * val(k)) / 10);
-      return `<g class="hex-stat"><title>${esc(tip)}</title>` +
+      return `<g class="hex-stat" data-s="${i}">` +
         `<rect class="hex-dot" x="${dx - 3}" y="${dy - 3}" width="6" height="6"/>` +
         `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle"><tspan class="hex-k">${k}</tspan><tspan class="hex-v" dx="4">${val(k)}</tspan></text></g>`;
     }).join("");
@@ -219,6 +228,32 @@
       `<g class="hex-grid">${[1, .8, .6, .4, .2].map((f) => `<polygon points="${ring(f)}"/>`).join("")}${axes}</g>` +
       `<polygon class="hex-shape" points="${shape}"/>${labels}</svg>`;
   }
+  // the stat's meaning, in a pixel box next to it (stays open while the mouse is on the stat, even after a click; tap to open / close on phones)
+  const statTip = (() => {
+    const box = document.createElement("div");
+    box.className = "stat-tip"; box.hidden = true; box.setAttribute("role", "tooltip");
+    document.body.appendChild(box);
+    let on = null;
+    function show(g) {
+      on = g;
+      box.textContent = t(STATS[+g.dataset.s][1]);
+      box.hidden = false;
+      const r = (g.querySelector("text") || g).getBoundingClientRect(), w = box.offsetWidth, h = box.offsetHeight;
+      const x = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+      let y = r.top - h - 12; if (y < 8) y = r.bottom + 12;
+      box.style.left = x + "px"; box.style.top = y + "px";
+    }
+    function hide() { on = null; box.hidden = true; }
+    party.addEventListener("pointerover", (e) => { if (e.pointerType !== "mouse") return; const g = e.target.closest(".hex-stat"); if (g && g !== on) show(g); });
+    party.addEventListener("pointerout", (e) => { if (e.pointerType !== "mouse") return; const g = e.target.closest(".hex-stat"); if (g && !g.contains(e.relatedTarget)) hide(); });
+    document.addEventListener("click", (e) => { if (on && !e.target.closest(".hex-stat")) hide(); });
+    const follow = () => { if (on) (on.isConnected && !on.closest("[hidden]") ? show(on) : hide()); };
+    window.addEventListener("scroll", follow, { passive: true });
+    window.addEventListener("resize", follow);
+    window.addEventListener("hashchange", hide);
+    document.addEventListener("langchange", () => { if (on) show(on); });
+    return { toggle: (g, type) => (type !== "mouse" && on === g ? hide() : show(g)), hide };
+  })();
   (CFG.characters || []).forEach((c, i) => {
     // (a clickable box rather than a <button>, so the Instagram link can sit inside it)
     const card = document.createElement("div");
@@ -245,6 +280,8 @@
       <span class="char-select">♥ TELLING THE STORY ♥</span>`;
     card.addEventListener("click", (e) => {
       if (e.target.closest("a")) return; // the IG link opens Instagram instead
+      const st = e.target.closest(".hex-stat");
+      if (st) { statTip.toggle(st, e.pointerType || "mouse"); return; } // a stat ("?" cursor) only shows its meaning
       sfx.select();
       story.view(c.name, true);
     });
@@ -671,8 +708,9 @@
         (by[parts[0]] = by[parts[0]] || []).push(p);
       });
       return Object.keys(by).sort(natural).map((name) => ({
-        // folder "Leia-The boss of the house" -> album "Leia", note "The boss of the house"
-        title: name.split("-")[0].trim() || name,
+        // folder "5 Leia-The boss of the house" -> album "Leia", note "The boss of the house"
+        // (a number in front only sets the order on the shelf; it isn't shown)
+        title: name.split("-")[0].trim().replace(/^\d+[\s._)]+/, "") || name,
         note: name.includes("-") ? name.slice(name.indexOf("-") + 1).trim() : "",
         photos: by[name].sort(natural).map((p) => ({ src: url(ROOT + p), key: p, caption: p.split("/").pop().replace(IMG, "") })),
       }));

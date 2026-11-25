@@ -330,7 +330,7 @@
     ["Party setup", "組隊設定", "组队设定"],
     ["Player 1 — who are you?", "玩家 1——你是誰？", "玩家 1——你是谁？"],
     ["Full name", "全名", "全名"],
-    ["e.g. Taylor Lin", "例如：林小明", "例如：林小明"],
+    ["e.g. Leia Dang", "例如：黨阿咪", "例如：党阿咪"],
     ["Email", "電子郵件", "电子邮件"],
     ["Will you join the adventure?", "你會加入這場冒險嗎？", "你会加入这场冒险吗？"],
     ["🎉 Accept quest!", "🎉 接受任務！", "🎉 接受任务！"],

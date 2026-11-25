@@ -4,7 +4,8 @@
 // To change a translation, edit it here. To translate new text, add a row.
 (() => {
   const LANGS = ["en", "zh-Hant", "zh-Hans"];
-  const LABEL = { en: "EN", "zh-Hant": "繁", "zh-Hans": "简" };
+  // the language button says where it goes next, in that language
+  const LABEL = { en: "切換到繁體中文", "zh-Hant": "切换成简体中文", "zh-Hans": "Switch to English" };
 
   // ---------- plain text ----------
   const ROWS = [
@@ -29,6 +30,14 @@
     ["Toggle sound", "切換音效", "切换音效"],
     ["Sound", "音效", "音效"],
     ["Full screen", "全螢幕", "全屏"],
+    // home page announcement sign (config.js announcements)
+    ["Announcements", "公告", "公告"],
+    ["Go", "前往", "前往"],
+    ["💌 Please RSVP by March 1, 2027!", "💌 請在 2027年3月1日 前回覆出席！", "💌 请在 2027年3月1日 前回复出席！"],
+    ["⛪ May 15, 2027 · Duke Chapel, Durham, NC", "⛪ 2027年5月15日 · 北卡羅來納州達勒姆 杜克教堂", "⛪ 2027年5月15日 · 北卡罗来纳州达勒姆 杜克教堂"],
+    ["✈️ Coming from far away? See the Travel page", "✈️ 從遠方來嗎？請看交通住宿頁", "✈️ 从远方来吗？请看交通住宿页"],
+    ["📸 New photos in the Gallery. Leave us a comment!", "📸 相簿有新照片，來留言給我們吧！", "📸 相册有新照片，来留言给我们吧！"],
+    ["🐾 Leia says: don't forget to RSVP!", "🐾 阿咪說：別忘了回覆出席喔！", "🐾 阿咪说：别忘了回复出席哦！"],
     ["Exit full screen", "離開全螢幕", "退出全屏"],
     ["♪ ON", "♪ 開", "♪ 开"],
     ["♪ OFF", "♪ 關", "♪ 关"],
@@ -94,12 +103,20 @@
     ["Class:", "職業：", "职业："],
     ["Origin", "家鄉", "出身"],
     ["personality", "個性", "个性"],
+    ["Likes", "喜歡", "喜欢"],
+    ["Hates", "討厭", "讨厌"],
+    ["Napping 😴, Good food 🍖", "睡午覺 😴、好吃的食物 🍖", "睡午觉 😴、好吃的食物 🍖"],
+    ["Bugs 🐛, Frogs 🐸", "蟲 🐛、青蛙 🐸", "虫 🐛、青蛙 🐸"],
+    ["Cars 🚗, Tools 🔧", "車 🚗、工具 🔧", "车 🚗、工具 🔧"],
+    ["Sweet potatoes 🍠, (Program) Bugs 👾", "地瓜 🍠、（程式）Bug 👾", "红薯 🍠、（程序）Bug 👾"],
+    ["Chin-Yi 💕, Treat 🐟", "進怡 💕、零食 🐟", "进怡 💕、零食 🐟"],
+    ["Sixuan 😾, Thunder ⛈️", "思旋 😾、打雷 ⛈️", "思旋 😾、打雷 ⛈️"],
     ["Yilan, Taiwan", "台灣宜蘭", "台湾宜兰"],
     ["Chunhua, China", "中國淳化", "中国淳化"],
-    ["State College, USA", "美國 State College", "美国 State College"],
+    ["State College, USA", "美國州學院", "美国州学院"],
     ["Spontaneous", "隨性", "随性"],
     ["Boss", "老大", "老大"],
-    ["Having affair with DK and Square", "跟 DK 和 Square 搞曖昧", "跟 DK 和 Square 搞暧昧"],
+    ["Having affair with DK and Square", "跟DK和正方形偷情", "跟DK和正方形偷情"],
     ["♥ TELLING THE STORY ♥", "♥ 正在講故事 ♥", "♥ 正在讲故事 ♥"],
     ["Chemist", "化學家", "化学家"],
     ["Computer Scientist", "電腦科學家", "计算机科学家"],
@@ -320,8 +337,11 @@
     ["RDU Airport", "RDU 機場", "RDU 机场"],
     ["Hotels", "飯店", "酒店"],
     ["Eats", "美食", "美食"],
-    ["Explore", "探索", "探索"],
-    ["Tap a pin on the map 📍", "點地圖上的圖釘 📍", "点地图上的图钉 📍"],
+    ["Our home", "我們的家", "我们的家"],
+    ["Chapel Hill", "教堂山", "教堂山"],
+    ["Cary", "卡里", "卡里"],
+    ["Raleigh", "羅利", "罗利"],
+    ["Tap a place on the map 📍", "點地圖上的地點 📍", "点地图上的地点 📍"],
     ["Inventory", "道具欄", "道具栏"],
     ["Flying in", "搭飛機", "搭飞机"],
     ["Where to stay", "住宿", "住宿"],
@@ -433,9 +453,21 @@
     ["🍜 <b>Eats</b> — Downtown Durham has amazing food: BBQ, ramen, biscuits, and more.",
      "🍜 <b>美食</b>——達勒姆市中心有超多好吃的：烤肉、拉麵、比司吉等等。",
      "🍜 <b>美食</b>——达勒姆市中心有超多好吃的：烤肉、拉面、司康饼等等。"],
-    ["🌳 <b>Explore</b> — Sarah P. Duke Gardens is gorgeous in the fall. Don't miss it!",
-     "🌳 <b>探索</b>——莎拉·杜克花園秋天超美，千萬別錯過！",
-     "🌳 <b>探索</b>——莎拉·杜克花园秋天超美，千万别错过！"],
+    ["🏡 <b>Home</b> — Where Chin-Yi, Sixuan and Leia live. Our little base camp in Durham!",
+     "🏡 <b>家</b>——進怡、思旋和阿咪住的地方，我們在達勒姆的小小基地！",
+     "🏡 <b>家</b>——进怡、思旋和阿咪住的地方，我们在达勒姆的小小基地！"],
+    ["🎓 <b>Chapel Hill</b> — Home of UNC. A cute college town with cafés and shops on Franklin Street, about 20 min from Duke.",
+     "🎓 <b>教堂山</b>——北卡大學（UNC）所在地。可愛的大學城，Franklin Street 上有咖啡廳和小店，離杜克約 20 分鐘。",
+     "🎓 <b>教堂山</b>——北卡大学（UNC）所在地。可爱的大学城，Franklin Street 上有咖啡厅和小店，离杜克约 20 分钟。"],
+    ["🏠 <b>Airbnb</b> — Coming with family or friends? A rental house around the Triangle can be a great choice.",
+     "🏠 <b>Airbnb</b>——和家人朋友一起來嗎？在三角區租一間民宿也是很棒的選擇。",
+     "🏠 <b>Airbnb</b>——和家人朋友一起来吗？在三角区租一间民宿也是很棒的选择。"],
+    ["🏘️ <b>Cary</b> — A quiet, friendly town with lovely parks and plenty of hotels close to RDU and I-40.",
+     "🏘️ <b>卡里</b>——安靜友善的小鎮，有漂亮的公園，靠近 RDU 機場和 I-40 公路，飯店也很多。",
+     "🏘️ <b>卡里</b>——安静友善的小镇，有漂亮的公园，靠近 RDU 机场和 I-40 公路，酒店也很多。"],
+    ["🏛️ <b>Raleigh</b> — North Carolina's capital: free museums, food halls and the State Capitol. About 35 min from Duke.",
+     "🏛️ <b>羅利</b>——北卡羅來納州首府：有免費博物館、美食廣場和州議會大廈。離杜克約 35 分鐘。",
+     "🏛️ <b>罗利</b>——北卡罗来纳州首府：有免费博物馆、美食广场和州议会大厦。离杜克约 35 分钟。"],
   ];
 
   // ---------- text with a changing part ($1, $2 = the changing part, itself translated) ----------
@@ -491,6 +523,7 @@
     const str = String(s), k = norm(str);
     if (!k) return str;
     const r = lookup(k, ctx);
+    if (r == null && str.includes("<")) { const h = HDICT[lang][htmlKey(str)]; if (h != null) return h; } // text with tags: the HTML rows
     return r == null ? str : str.match(/^\s*/)[0] + r + str.match(/\s*$/)[0];
   }
 
@@ -561,7 +594,8 @@
   function paint() {
     document.documentElement.lang = lang;
     if (!btn) return;
-    btn.textContent = LABEL[lang];
+    const lbl = btn.querySelector(".lang-label") || btn;
+    lbl.textContent = LABEL[lang];
     const next = LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length];
     btn.title = `${NAMES[lang]} → ${NAMES[next]}`; btn.setAttribute("aria-label", btn.title);
   }

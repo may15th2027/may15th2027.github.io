@@ -161,7 +161,7 @@
     const day = () => { art.classList.remove("night"); setNight(false); };
     art.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
-      if (e.target.closest("a, button, .speech")) return; // clicks on the cat / mailbox still work as before
+      if (e.target.closest("a, button, .speech")) return; // clicks on the cat / mailbox / banner still work as before
       e.preventDefault(); // no image drag or text selection while holding
       art.classList.add("night"); setNight(true);
     });
@@ -189,6 +189,52 @@
     p.style.width = p.style.height = s + "px";
     petals.appendChild(p);
   }
+  // announcement banner on the title picture: messages scroll by one at a time; click it for the full list
+  // (messages in config.js "announcements")
+  (() => {
+    const btn = $("#news"), pop = $("#newsPop");
+    const list = (CFG.announcements || []).map((a) => (typeof a === "string" ? { text: a } : a)).filter((a) => a && a.text);
+    if (!btn || !list.length) return;
+    btn.hidden = false;
+    const win = btn.querySelector(".news-window"), text = btn.querySelector(".news-text"), ul = pop.querySelector(".news-list");
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const still = matchMedia("(prefers-reduced-motion: reduce)");
+    btn.querySelector(".news-count").textContent = list.length;
+    let i = 0, anim = null, timer = 0;
+
+    function next() {
+      clearTimeout(timer);
+      const a = list[i++ % list.length];
+      text.textContent = t(a.text);
+      const W = win.clientWidth, w = text.scrollWidth;
+      if (!W || still.matches || !text.animate) { text.style.transform = ""; timer = setTimeout(next, W ? 4000 : 1000); return; }
+      // slide in from the right, all the way through, then the next message
+      // (the very first one starts already in view, so the banner is never empty when the page opens)
+      const from = i === 1 ? 0 : W;
+      anim = text.animate([{ transform: `translateX(${from}px)` }, { transform: `translateX(${-w}px)` }],
+        { duration: ((from + w) / 55) * 1000, delay: from ? 0 : 1500, easing: "linear", fill: "backwards" });
+      anim.onfinish = next;
+    }
+    btn.addEventListener("pointerenter", () => anim && anim.pause());
+    btn.addEventListener("pointerleave", () => anim && pop.hidden && anim.play());
+
+    function fill() {
+      btn.setAttribute("aria-label", t("Announcements"));
+      ul.innerHTML = list.map((a) => `<li><span class="news-item">${esc(t(a.text))}</span>` +
+        (a.go ? `<a class="btn btn-pink news-go" href="#${esc(a.go)}" data-go="${esc(a.go)}">${esc(t("Go"))} ▶</a>` : "") + "</li>").join("");
+    }
+    function open() { sfx.select(); fill(); pop.hidden = false; anim && anim.pause(); pop.querySelector(".news-close").focus(); }
+    function close() { pop.hidden = true; anim && anim.play(); btn.focus({ preventScroll: true }); }
+    btn.addEventListener("click", open);
+    pop.addEventListener("click", (e) => {
+      if (e.target === pop || e.target.closest(".news-close")) { sfx.blip(); close(); }
+      else if (e.target.closest("[data-go]")) { pop.hidden = true; anim && anim.play(); } // the page switch itself is done by the [data-go] handler
+    });
+    window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) close(); });
+    document.addEventListener("langchange", () => { if (anim) anim.cancel(); i = Math.max(0, i - 1); next(); if (!pop.hidden) fill(); });
+    next();
+  })();
+
   // click Leia, Chin-Yi or Sixuan on the title picture: they say something (one speech bubble, moved over whoever talks)
   const catSpeech = $("#catSpeech");
   const TALK = {
@@ -295,6 +341,8 @@
       <dl class="char-info">
         <dt>Origin</dt><dd>${esc(c.origin)}</dd>
         <dt>personality</dt><dd>${esc(c.skill)}</dd>
+        ${c.likes ? `<dt>Likes</dt><dd>${esc(c.likes)}</dd>` : ""}
+        ${c.hates ? `<dt>Hates</dt><dd>${esc(c.hates)}</dd>` : ""}
         ${ig ? `<dt>IG</dt><dd><a class="char-ig" href="https://www.instagram.com/${encodeURIComponent(ig)}/" target="_blank" rel="noopener" data-no-i18n>@${esc(ig).replace(/_/g, "_<wbr>")} ↗</a></dd>` : ""}
       </dl>
       ${hexStats(c.stats || {})}
@@ -885,13 +933,65 @@
     chapel: "⛪ <b>Duke Chapel</b> — 401 Chapel Dr, Durham. Ceremony location! <a href='https://maps.google.com/?q=Duke+Chapel' target='_blank' rel='noopener'>Directions ↗</a>",
     hotel: "🏨 <b>Hotels</b> — Room block details coming soon. Stay near campus or downtown Durham.",
     food: "🍜 <b>Eats</b> — Downtown Durham has amazing food: BBQ, ramen, biscuits, and more.",
-    fun: "🌳 <b>Explore</b> — Sarah P. Duke Gardens is gorgeous in the fall. Don't miss it!",
+    home: "🏡 <b>Home</b> — Where Chin-Yi, Sixuan and Leia live. Our little base camp in Durham!",
+    chapelhill: "🎓 <b>Chapel Hill</b> — Home of UNC. A cute college town with cafés and shops on Franklin Street, about 20 min from Duke.",
+    airbnb: "🏠 <b>Airbnb</b> — Coming with family or friends? A rental house around the Triangle can be a great choice.",
+    cary: "🏘️ <b>Cary</b> — A quiet, friendly town with lovely parks and plenty of hotels close to RDU and I-40.",
+    raleigh: "🏛️ <b>Raleigh</b> — North Carolina's capital: free museums, food halls and the State Capitol. About 35 min from Duke.",
   };
-  $$(".pin").forEach((p) => p.addEventListener("click", () => {
-    sfx.blip();
-    $$(".pin").forEach((x) => x.classList.toggle("on", x === p));
-    $("#mapInfo").innerHTML = pinInfo[p.dataset.pin];
-  }));
+  // Clicking a place opens a pop-up with its photo and description.
+  // Photo: assets/places/<name>.jpg (or .png / .webp), <name> = the data-pin of the place, e.g. assets/places/chapel.jpg.
+  // No photo yet? The pop-up shows that spot of the map, zoomed in.
+  (() => {
+    const pop = $("#placePop"), img = $("img", pop), frame = $(".place-photo", pop);
+    const title = $("#placeTitle"), text = $(".place-text", pop);
+    // the map picture comes in each language: assets/map-en.webp, map-zh-Hant.webp, map-zh-Hans.webp (same layout)
+    const mapImg = $("#mapImg");
+    const mapSrc = () => `assets/map-${(window.I18N && I18N.lang) || "en"}.webp`;
+    const setMap = () => { if (mapImg.getAttribute("src") !== mapSrc()) mapImg.src = mapSrc(); };
+    setMap();
+    let spot = null, tries = 0;
+    const EXT = ["jpg", "png", "webp"];
+    function mapCrop(b) {
+      // the photo frame is 4:3 like the map, so a square region in % of the map fills it
+      const cs = getComputedStyle(b), v = (k) => parseFloat(cs.getPropertyValue(k));
+      const l = v("--l"), tp = v("--t"), w = v("--w"), h = v("--h");
+      const s = Math.min(100, Math.max(w, h) * 1.6), cx = l + w / 2, cy = tp + h / 2;
+      const x = Math.max(0, Math.min(100 - s, cx - s / 2)), y = Math.max(0, Math.min(100 - s, cy - s / 2));
+      frame.style.backgroundImage = `url(${mapSrc()})`;
+      frame.style.backgroundSize = `${(100 / s) * 100}%`;
+      frame.style.backgroundPosition = `${s < 100 ? (x / (100 - s)) * 100 : 0}% ${s < 100 ? (y / (100 - s)) * 100 : 0}%`;
+    }
+    function tryPhoto() {
+      if (tries >= EXT.length) { img.hidden = true; mapCrop(spot); return; }
+      img.src = `assets/places/${spot.dataset.pin}.${EXT[tries++]}`;
+    }
+    img.addEventListener("load", () => { img.hidden = false; frame.style.backgroundImage = ""; });
+    img.addEventListener("error", tryPhoto);
+    function fill() {
+      // "✈ <b>RDU Airport</b> — text": the bold part becomes the title, the rest the description
+      const html = t(pinInfo[spot.dataset.pin]);
+      const m = html.match(/^(.*?)<b>(.*?)<\/b>\s*[—–-]+\s*(.*)$/s);
+      title.innerHTML = m ? `${m[1].trim()} ${m[2]}` : esc(spot.getAttribute("aria-label") || "");
+      text.innerHTML = m ? m[3] : html;
+      img.alt = title.textContent;
+    }
+    function open(b) {
+      spot = b; tries = 0;
+      $$(".map-area [data-pin]").forEach((x) => x.classList.toggle("on", x === b));
+      fill(); img.hidden = true; mapCrop(b); tryPhoto();
+      pop.hidden = false; $(".news-close", pop).focus();
+    }
+    function close() {
+      pop.hidden = true;
+      $$(".map-area [data-pin]").forEach((x) => x.classList.remove("on"));
+      if (spot) spot.focus({ preventScroll: true });
+    }
+    $$(".map-area [data-pin]").forEach((b) => b.addEventListener("click", () => { sfx.select(); open(b); }));
+    pop.addEventListener("click", (e) => { if (e.target === pop || e.target.closest(".news-close")) { sfx.blip(); close(); } });
+    window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) close(); });
+    document.addEventListener("langchange", () => { setMap(); if (!pop.hidden) { fill(); if (img.hidden) mapCrop(spot); } });
+  })();
 
   /* ================= RSVP ================= */
   const form = $("#rsvpForm");

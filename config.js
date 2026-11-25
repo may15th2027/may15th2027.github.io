@@ -14,22 +14,26 @@ window.WEDDING_CONFIG = {
   // ---- Character cards (top of "Our Story") ----
   // stats = the six RPG stats on the hexagon chart, each 1–10:
   //   STR strength · DEX dexterity · CON constitution · INT intelligence · WIS wisdom · CHA charisma
+  // likes / hates = one short line each ("???" until you decide; leave "" to hide the line).
   // ig = Instagram handle (e.g. "leia_the_little_princess"); leave "" to hide the IG line.
   // Clicking a card retells the SAME story from that character's point of view.
   characters: [
     {
       name: "Chin-Yi", emoji: "👩", photo: "assets/chinyi.png", tag: "P1",
       className: "Chemist", origin: "Yilan, Taiwan", skill: "Spontaneous", ig: "pinkpig0720",
-      stats: { STR: 7, DEX: 7, CON: 9, INT: 9, WIS: 6, CHA: 10 },
+      likes: "Napping 😴, Good food 🍖", hates: "Bugs 🐛, Frogs 🐸",
+      stats: { STR: 7, DEX: 8, CON: 9, INT: 9, WIS: 6, CHA: 10 },
     },
     {
       name: "Sixuan", emoji: "👨", photo: "assets/sixuan.png", tag: "P2",
       className: "Computer Scientist", origin: "Chunhua, China", skill: "Overthinking", ig: "nickdang1019",
+      likes: "Cars 🚗, Tools 🔧", hates: "Sweet potatoes 🍠, (Program) Bugs 👾",
       stats: { STR: 10, DEX: 7, CON: 9, INT: 9, WIS: 6, CHA: 8 },
     },
     {
       name: "Leia", emoji: "🐱", photo: "assets/leia.png", tag: "P3", nameIcon: "🐾",
       className: "Boss", origin: "State College, USA", skill: "Having affair with DK and Square", ig: "leia_the_little_princess",
+      likes: "Chin-Yi 💕, Treat 🐟", hates: "Sixuan 😾, Thunder ⛈️",
       stats: { STR: 5, DEX: 10, CON: 6, INT: 3, WIS: 10, CHA: 10 },
     },
   ],
@@ -42,6 +46,18 @@ window.WEDDING_CONFIG = {
   // is its caption. Albums and photos are sorted by name; start a name with a number
   // ("1 Our Trips", "2 Leia") to choose the order. The first photo is the album cover.
   // On the live site the list comes from GitHub, so new photos show once they're pushed.
+  // ---- Scrolling announcement sign at the top of the home page ----
+  // Each line: "text", or { text: "...", go: "rsvp" } to make it a link to a page
+  // (home / story / gallery / board / wedding / travel / rsvp). Leave the list empty [] to hide the sign.
+  // (Add the Chinese for a new line in i18n.js, or it stays in English.)
+  announcements: [
+    { text: "💌 Please RSVP by March 1, 2027!", go: "rsvp" },
+    { text: "⛪ May 15, 2027 · Duke Chapel, Durham, NC", go: "wedding" },
+    { text: "✈️ Coming from far away? See the Travel page", go: "travel" },
+    { text: "📸 New photos in the Gallery. Leave us a comment!", go: "gallery" },
+    "🐾 Leia says: don't forget to RSVP!",
+  ],
+
   galleryRepo: { repo: "may15th2027/may15th2027.github.io", branch: "master" },
 
   // ---- Our Story: the same moments, each told in 3 versions (Chin-Yi / Sixuan / Leia) ----

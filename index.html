@@ -25,14 +25,34 @@
   </div>
 
   <!-- ============ HUD (top-right) ============ -->
+  <!-- a place on the travel map: photo + description (opened by clicking the place on the map) -->
+  <div class="pop place-pop" id="placePop" role="dialog" aria-modal="true" aria-labelledby="placeTitle" hidden>
+    <div class="pop-box parchment place-box">
+      <button class="news-close" type="button" aria-label="Close">✕</button>
+      <div class="place-photo"><img alt="" hidden /></div>
+      <h3 id="placeTitle" data-no-i18n></h3>
+      <p class="place-text" data-no-i18n></p>
+    </div>
+  </div>
+
+  <!-- all announcements (opened from the home page banner) -->
+  <div class="pop news-pop" id="newsPop" role="dialog" aria-modal="true" aria-labelledby="newsTitle" hidden>
+    <div class="pop-box parchment news-box">
+      <button class="news-close" type="button" aria-label="Close">✕</button>
+      <h3 id="newsTitle"><span class="pxi pxi-spk"></span> Announcements</h3>
+      <ul class="news-list" data-no-i18n></ul>
+    </div>
+  </div>
+
   <div class="hud">
     <button id="fullBtn" class="hud-btn full-btn" type="button" aria-label="Full screen" title="Full screen" hidden>
       <svg class="fs-in" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 1h5v2H3v3H1zM10 1h5v5h-2V3h-3zM1 10h2v3h3v2H1zM13 10h2v5h-5v-2h3z"/></svg>
       <svg class="fs-out" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M4 1h2v5H1V4h3zM10 1h2v3h3v2h-5zM1 10h5v5H4v-3H1zM10 10h5v2h-3v3h-2z"/></svg>
     </button>
-    <button id="langBtn" class="hud-btn lang-btn" type="button" data-no-i18n>EN</button>
     <button id="chatBtn" class="hud-btn chat-btn" aria-label="Open chat" aria-expanded="false" aria-controls="chatBox" title="Ask us anything"><span class="pxi pxi-chat"></span></button>
     <button id="soundBtn" class="hud-btn" aria-label="Toggle sound" title="Sound">♪ ON</button>
+    <!-- language switch: English → 繁體中文 → 简体中文 → English; the label is written in the language it switches to -->
+    <button id="langBtn" class="hud-btn lang-btn" type="button" data-no-i18n><span class="lang-label">切換到繁體中文</span></button>
   </div>
 
   <!-- ============ CHAT (always answers with the same hint) ============ -->
@@ -66,6 +86,11 @@
             <img src="assets/background.png" class="hero-img" draggable="false" alt="Pixel art: Chin-Yi and Sixuan sitting on a log with their cat, looking toward Duke Chapel at sunset, under a sign reading Chin-Yi &amp; Sixuan, Our Wedding Adventure, We&rsquo;re Getting Married!" />
             <img src="assets/background-night.png" class="hero-img hero-night" draggable="false" alt="" aria-hidden="true" />
             <div class="petals" aria-hidden="true"></div>
+            <!-- announcement banner: one message at a time; click it (or the speaker) to see them all (messages: config.js "announcements") -->
+            <button class="news" id="news" type="button" aria-haspopup="dialog" aria-controls="newsPop" data-no-i18n hidden>
+              <span class="news-spk" aria-hidden="true"><span class="pxi pxi-spk"></span><span class="news-count"></span></span>
+              <span class="news-window"><span class="news-text"></span></span>
+            </button>
             <button class="hot" id="catBtn" data-talk-who="leia" style="--l:55.2%;--t:70%;--w:3.8%;--h:9.5%;--ml:56.9%;--mw:4.8%" aria-label="Pet the cat"></button>
             <button class="hot" data-talk-who="chinyi" style="--l:42%;--t:61%;--w:6.6%;--h:16%;--ml:39.4%;--mw:8.8%" aria-label="Talk to Chin-Yi"></button>
             <button class="hot" data-talk-who="sixuan" style="--l:48.6%;--t:59.7%;--w:5.7%;--h:17.3%;--ml:48.1%;--mw:7.6%" aria-label="Talk to Sixuan"></button>
@@ -251,14 +276,20 @@
 
       <div class="map panel">
         <div class="map-area">
-        <div class="map-grid" aria-hidden="true"></div>
-        <button class="pin" style="left:18%;top:30%" data-pin="airport">✈<span>RDU Airport</span></button>
-        <button class="pin" style="left:55%;top:55%" data-pin="chapel">⛪<span>Duke Chapel</span></button>
-        <button class="pin" style="left:72%;top:25%" data-pin="hotel">🏨<span>Hotels</span></button>
-        <button class="pin" style="left:38%;top:72%" data-pin="food">🍜<span>Eats</span></button>
-        <button class="pin" style="left:82%;top:70%" data-pin="fun">🌳<span>Explore</span></button>
+        <img class="map-img" id="mapImg" src="assets/map-en.webp" width="1448" height="1086" draggable="false"
+          alt="Pixel map of North Carolina's Research Triangle: Durham, Duke University, Chapel Hill, RDU airport, Cary, Morrisville and Raleigh" />
+        <!-- clickable places drawn on the map. --l / --t / --w / --h = box over the drawing, in % of the picture (1448 × 1086) -->
+        <button class="spot" style="--l:23.4%;--t:16.4%;--w:10.6%;--h:12.6%" data-pin="chapel" aria-label="Duke Chapel"></button>
+        <button class="spot" style="--l:36.9%;--t:9.6%;--w:8.8%;--h:10%" data-pin="food" aria-label="Eats"></button>
+        <button class="spot" style="--l:41.6%;--t:20.6%;--w:11.8%;--h:11.4%" data-pin="hotel" aria-label="Hotels"></button>
+        <button class="spot" style="--l:11.7%;--t:9.9%;--w:7.4%;--h:9.6%" data-pin="home" aria-label="Our home"></button>
+        <button class="spot" style="--l:2.4%;--t:37.6%;--w:17.6%;--h:15.8%" data-pin="chapelhill" aria-label="Chapel Hill"></button>
+        <button class="spot" style="--l:74.9%;--t:47%;--w:8.2%;--h:11.6%" data-pin="airbnb" aria-label="Airbnb"></button>
+        <button class="spot" style="--l:37%;--t:77.8%;--w:9.8%;--h:10.2%" data-pin="cary" aria-label="Cary"></button>
+        <button class="spot" style="--l:76%;--t:68.2%;--w:16.6%;--h:21.6%" data-pin="raleigh" aria-label="Raleigh"></button>
+        <button class="spot" style="--l:51%;--t:52.8%;--w:11.2%;--h:11.6%" data-pin="airport" aria-label="RDU Airport"></button>
         </div>
-        <div class="map-info parchment" id="mapInfo" data-i18n-html>Tap a pin on the map 📍</div>
+        <div class="map-info parchment">Tap a place on the map 📍</div>
       </div>
 
       <h3 class="section-label">Inventory</h3>

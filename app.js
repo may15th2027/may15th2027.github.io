@@ -220,10 +220,12 @@
       `<polygon class="hex-shape" points="${shape}"/>${labels}</svg>`;
   }
   (CFG.characters || []).forEach((c, i) => {
-    const card = document.createElement("button");
-    card.type = "button";
+    // (a clickable box rather than a <button>, so the Instagram link can sit inside it)
+    const card = document.createElement("div");
     card.className = "char panel parchment";
+    card.setAttribute("role", "button"); card.tabIndex = 0;
     card.setAttribute("aria-pressed", "false");
+    const ig = String(c.ig || "").trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//i, "").replace(/\/.*$/, "");
     const stars = (n) => `<span class="stars" aria-label="${n} out of 5">${"★".repeat(n)}<i>${"★".repeat(5 - n)}</i></span>`;
     card.innerHTML = `
       <span class="char-tag">${esc(c.tag || "P" + (i + 1))}</span>
@@ -237,13 +239,19 @@
       <dl class="char-info">
         <dt>Origin</dt><dd>${esc(c.origin)}</dd>
         <dt>personality</dt><dd>${esc(c.skill)}</dd>
+        ${ig ? `<dt>IG</dt><dd><a class="char-ig" href="https://www.instagram.com/${encodeURIComponent(ig)}/" target="_blank" rel="noopener" data-no-i18n>@${esc(ig).replace(/_/g, "_<wbr>")} ↗</a></dd>` : ""}
       </dl>
       ${Array.isArray(c.stats) ? `<ul class="char-stats">${c.stats.map(([k, n]) => `<li><span>${esc(k)}</span>${stars(n)}</li>`).join("")}</ul>` : hexStats(c.stats)}
       <span class="char-play">▶ See the story as ${esc(c.name)}</span>
       <span class="char-select">♥ TELLING THE STORY ♥</span>`;
-    card.addEventListener("click", () => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("a")) return; // the IG link opens Instagram instead
       sfx.select();
       story.view(c.name, true);
+    });
+    card.addEventListener("keydown", (e) => {
+      if (e.target !== card || (e.key !== "Enter" && e.key !== " ")) return;
+      e.preventDefault(); card.click();
     });
     party.appendChild(card);
     if (i === 0 && CFG.characters.length === 2) {
@@ -512,7 +520,7 @@
     });
     window.addEventListener("keydown", (e) => {
       if ($("#screen-story").hidden || !pop.hidden) return;
-      if (e.target !== dlg && e.target.closest && e.target.closest("button, a, input, textarea, select")) return;
+      if (e.target !== dlg && e.target.closest && e.target.closest("button, a, input, textarea, select, [role=button]")) return;
       if (e.key === " " || e.key === "Enter" || e.key === "ArrowRight") { e.preventDefault(); dlg.click(); }
       if (e.key === "ArrowLeft" && !backBtn.hidden) { e.preventDefault(); backBtn.click(); }
     });
@@ -525,43 +533,60 @@
   // sends them back so every visitor sees them. Without it (testing), they're kept in this browser only.
   const notes = (() => {
     const API = CFG.messagesEndpoint || CFG.rsvpEndpoint;
-    const MINE = "notes-mine";
-    let data = null, loading = null;
+    // Everything is read fresh from the Google Sheet each time (no copies kept in the browser).
+    try { localStorage.removeItem("notes-mine"); } catch (e) {} // (an older version kept copies here)
+    let data = null, loading = null, status = API ? "loading" : "offline";
     const subs = [];
     const emit = () => subs.forEach((f) => f(data));
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
     function load() {
-      if (loading) return loading;
+      if (loading) return loading; // one request at a time
       loading = (async () => {
-        let d = { messages: [], comments: [] };
-        if (API) {
-          try {
-            const j = await (await fetch(API + (API.includes("?") ? "&" : "?") + "action=notes", { cache: "no-store" })).json();
-            if (j && j.ok) d = { messages: j.messages || [], comments: j.comments || [] };
-          } catch (e) {}
+        try {
+          if (!API) throw Error("offline");
+          const res = await fetch(API + (API.includes("?") ? "&" : "?") + "action=notes&t=" + Date.now(), { cache: "no-store" });
+          const j = await res.json();
+          if (!j || !j.ok) throw Error("bad reply");
+          data = { messages: j.messages || [], comments: j.comments || [] }; status = "ok";
+        } catch (e) {
+          status = API ? "error" : "offline";
+          if (!data) data = { messages: [], comments: [] };
         }
-        // my own posts: always shown to me (in preview mode they live only here; online, until the sheet has them)
-        const keep = API ? 60 * 60 * 1000 : Infinity;
-        const mine = store.get(MINE, []).filter((x) => Date.now() - Date.parse(x.time) < keep);
-        store.set(MINE, mine);
-        for (const x of mine) {
-          const list = x.kind === "comment" ? d.comments : d.messages;
-          if (!list.some((y) => y.id === x.id)) list.push(x);
-        }
-        data = d; emit(); return d;
-      })();
+        emit(); return data;
+      })().finally(() => { loading = null; });
       return loading;
     }
+    // send to the sheet, then read the sheet back: it only counts as sent once it's really there
     async function post(kind, fields) {
-      const x = { kind, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), time: new Date().toISOString(), ...fields };
-      if (API) await fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(x) });
-      store.set(MINE, [...store.get(MINE, []), x].slice(-100));
-      await load();
-      const list = kind === "comment" ? data.comments : data.messages;
-      if (!list.some((y) => y.id === x.id)) list.push(x);
-      emit();
+      if (!API) throw Error("offline");
+      const x = { kind, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), ...fields };
+      await fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(x) });
+      if (loading) await loading; // a read that started before the post doesn't count
+      for (const pause of [0, 1500, 3000]) {
+        if (pause) await wait(pause);
+        await load();
+        const list = kind === "comment" ? data.comments : data.messages;
+        if (status === "ok" && list.some((y) => y.id === x.id)) return;
+      }
+      throw Error("not confirmed");
     }
     const locale = () => ({ "zh-Hant": "zh-TW", "zh-Hans": "zh-CN" }[window.I18N && I18N.lang] || "en-US");
     const date = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString(locale(), { year: "numeric", month: "short", day: "numeric" }); };
+    // pop-up while a message / comment is being sent: "Sending…" until it's done, then "Sent! ✨"
+    const sending = (() => {
+      const el = document.createElement("div");
+      el.className = "send-pop"; el.hidden = true;
+      el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite");
+      el.innerHTML = `<div class="send-box parchment"><div class="send-icon"></div><p class="send-msg"></p></div>`;
+      document.body.appendChild(el);
+      return {
+        show(msg, icon, busy = false) {
+          $(".send-icon", el).textContent = icon; $(".send-msg", el).textContent = msg;
+          el.classList.toggle("busy", busy); el.hidden = false;
+        },
+        hide() { el.hidden = true; },
+      };
+    })();
     // the name + message form (board and photo comments share it)
     let last = 0;
     function wire(form, kind, extra, max) {
@@ -575,17 +600,25 @@
         err.textContent = !name ? "Please enter your name." : !text ? "Please write a message." : Date.now() - last < 15000 ? "Slow down a little — try again in a few seconds!" : "";
         if (err.textContent) { sfx.error(); return; }
         btn.disabled = true;
+        sending.show("Sending…", "🕊️", true);
+        const shown = Date.now();
         try {
           await post(kind, { name, text, website: form.elements.website.value, ...extra() });
+          await wait(Math.max(0, 700 - (Date.now() - shown))); // stay up long enough to read
           last = Date.now(); store.set("guest-name", name);
           textIn.value = ""; if (count) count.textContent = `0/${max}`;
           sfx.select();
-        } catch (ex) { err.textContent = "Hmm, the carrier pigeon got lost. Please try again!"; sfx.error(); }
-        finally { btn.disabled = false; }
+          sending.show("Sent! ✨", "💌"); await wait(1000);
+        } catch (ex) {
+          await wait(Math.max(0, 700 - (Date.now() - shown)));
+          const msg = ex.message === "offline" ? "The Forum isn't open yet — check back soon!" : "Hmm, the carrier pigeon got lost. Please try again!";
+          err.textContent = msg; sfx.error();
+          sending.show(msg, "😿"); await wait(2200);
+        } finally { sending.hide(); btn.disabled = false; }
       });
     }
     $$("[data-notes-local]").forEach((x) => (x.hidden = !!API));
-    return { load, post, wire, date, on: (f) => subs.push(f), get data() { return data; } };
+    return { load, post, wire, date, on: (f) => subs.push(f), get data() { return data; }, get status() { return status; } };
   })();
 
   /* ================= MESSAGE BOARD ================= */
@@ -594,7 +627,9 @@
     const tilt = (i) => [-2, 1.5, -1, 2, -1.5, 1][i % 6];
     const colors = ["#fff3dc", "#ffe1ea", "#e3f3ff", "#eaf7dc", "#fff0c4"];
     function render(d) {
-      if (!d) { wall.innerHTML = `<p class="note-empty">Loading messages…</p>`; return; }
+      if (!d || notes.status === "loading") { wall.innerHTML = `<p class="note-empty">Loading messages…</p>`; return; }
+      if (notes.status === "offline") { wall.innerHTML = `<p class="note-empty">The Forum isn't open yet — check back soon!</p>`; return; }
+      if (notes.status === "error" && !d.messages.length) { wall.innerHTML = `<p class="note-empty">Couldn't load the messages right now. Please try again later.</p>`; return; }
       const list = [...d.messages].sort((a, b) => Date.parse(b.time) - Date.parse(a.time));
       wall.innerHTML = list.length ? list.map((m, i) =>
         `<article class="note-card" style="--tilt:${tilt(i)}deg;--paper:${colors[i % colors.length]}">` +
@@ -750,7 +785,9 @@
     function renderComments() {
       if (lb.hidden || !photos[cur]) return;
       const list = commentsOf(photos[cur].key);
-      $("#lbList").innerHTML = !notes.data ? `<li class="lb-empty">Loading comments…</li>`
+      $("#lbList").innerHTML = !notes.data || notes.status === "loading" ? `<li class="lb-empty">Loading comments…</li>`
+        : notes.status === "offline" ? `<li class="lb-empty">Comments aren't open yet — check back soon!</li>`
+        : notes.status === "error" && !commentsOf(photos[cur].key).length ? `<li class="lb-empty">Couldn't load the comments right now.</li>`
         : list.length ? list.map((c) => `<li><b data-no-i18n>${esc(c.name)}</b><time data-no-i18n>${esc(notes.date(c.time))}</time>` +
           `<p data-no-i18n>${esc(c.text)}</p></li>`).join("")
         : `<li class="lb-empty">No comments yet — say something nice! 💬</li>`;

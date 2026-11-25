@@ -875,3 +875,18 @@ html:lang(zh-Hans) { --font: "Pixelify Sans", "VT323", "Microsoft YaHei", "PingF
 .hex-stat .hex-v { fill: var(--pink-dark); font-size: 15px; }
 .hex-stat { cursor: help; }
 .hex-stat:hover text { fill: var(--pink-dark); }
+
+/* ===== "Sending…" pop-up for Forum messages and photo comments ===== */
+.send-pop { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; background: rgba(30,16,8,.45); }
+.send-pop[hidden] { display: none; }
+.send-box { min-width: 240px; max-width: min(360px, calc(100vw - 40px)); padding: 22px 26px 18px; text-align: center; animation: pop-in .18s steps(3); }
+.send-icon { font-size: 46px; line-height: 1; }
+.send-pop.busy .send-icon { animation: send-fly .9s steps(4) infinite; }
+.send-msg { margin: 12px 0 0; font: 600 20px var(--font); color: var(--ink); }
+@keyframes send-fly { 0%, 100% { transform: translate(-6px, 2px); } 50% { transform: translate(6px, -6px); } }
+@keyframes pop-in { from { transform: scale(.85); opacity: 0; } }
+
+/* ===== character cards: Instagram link ===== */
+.char:focus-visible { outline: 3px dashed var(--pink-dark); outline-offset: 6px; }
+.char-ig { color: var(--pink-dark); font-weight: 700; text-decoration: none; overflow-wrap: break-word; cursor: var(--cur-click); }
+.char-ig:hover, .char-ig:focus-visible { text-decoration: underline; }

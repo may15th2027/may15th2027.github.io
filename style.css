@@ -595,7 +595,7 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
 }
 /* VN tweaks */
 .vn .nameplate { left: 19.5%; min-width: 10.5cqw; text-align: center; z-index: 3; }
-.vn-badge { width: auto; min-width: 29.4%; max-width: 60%; justify-content: flex-end; gap: 2cqw; padding: 0 1.6cqw; }
+.vn-badge { width: auto; min-width: 0; max-width: 60%; justify-content: flex-end; gap: 2cqw; padding: 0 1.6cqw; }
 @media (max-width: 700px) { .vn .nameplate { left: 96px; min-width: 0; } .vn-badge { max-width: 70%; } }
 
 /* ===== Readable text: pixel font for titles/buttons, Nunito for reading ===== */
@@ -796,3 +796,14 @@ input:not([type="radio"]):not([type="checkbox"]), textarea { cursor: text; }
 .chat-form input:focus { outline: 3px dashed var(--pink-dark, #c0475f); outline-offset: 1px; }
 .chat-send { padding: 8px 14px; font-size: 16px; }
 @media (max-width: 700px) { .chat-box { bottom: 116px; height: 360px; } }
+
+/* ===== language switch (EN → 繁 → 简), above the chat button ===== */
+.lang-btn { width: 52px; height: 52px; padding: 0; display: grid; place-items: center; font-size: 20px; box-shadow: 0 4px 0 rgba(0,0,0,.3); }
+.lang-btn:hover { background: var(--pink-dark); }
+/* Chinese: the pixel fonts have no Chinese letters, so use the system's Chinese font for those */
+html:lang(zh-Hant) { --font: "Pixelify Sans", "VT323", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+  --font-read: "Nunito", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", system-ui, sans-serif; }
+html:lang(zh-Hans) { --font: "Pixelify Sans", "VT323", "Microsoft YaHei", "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
+  --font-read: "Nunito", "Microsoft YaHei", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; }
+.chat-box { bottom: 182px; }
+@media (max-width: 700px) { .chat-box { bottom: 178px; } }

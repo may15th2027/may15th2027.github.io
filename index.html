@@ -26,6 +26,7 @@
 
   <!-- ============ HUD (top-right) ============ -->
   <div class="hud">
+    <button id="langBtn" class="hud-btn lang-btn" type="button" data-no-i18n>EN</button>
     <button id="chatBtn" class="hud-btn chat-btn" aria-label="Open chat" aria-expanded="false" aria-controls="chatBox" title="Ask us anything"><span class="pxi pxi-chat"></span></button>
     <button id="soundBtn" class="hud-btn" aria-label="Toggle sound" title="Sound">♪ ON</button>
   </div>
@@ -123,19 +124,19 @@
             <div class="vn-canvas">
               <div class="scene-emoji" id="sceneEmoji">🌸</div>
               <img class="scene-photo" id="scenePhoto" alt="" hidden />
-              <div class="vn-title"><span class="vn-title-icon" id="vnIcon">🏸</span><span>Ch. <span id="vnNum">1</span></span><b id="vnName">How we met</b></div>
-              <div class="vn-badge"><span>🏛️ <span id="scenePlace">Somewhere</span></span><span>📅 <span id="sceneYear">20XX</span></span></div>
+              <div class="vn-title"><span class="vn-title-icon" id="vnIcon">🏸</span><span id="vnNum">Ch. 1</span><b id="vnName">How we met</b></div>
+              <div class="vn-badge"><span>🏛️ <span id="scenePlace" data-no-i18n>Somewhere</span></span><span>📅 <span id="sceneYear" data-no-i18n>20XX</span></span></div>
             </div>
           </div>
           <div class="dialog" id="dialog" tabindex="0" aria-live="polite">
             <div class="dlg-portrait" id="dlgPortrait" aria-hidden="true"></div>
-            <div class="nameplate" id="speaker">Narrator</div>
+            <div class="nameplate" id="speaker" data-no-i18n>Narrator</div>
             <button type="button" class="dialog-back" id="dialogBack" aria-label="Go back to the previous line" hidden>◀ Back</button>
-            <p id="dialogText"></p>
+            <p id="dialogText" data-no-i18n></p>
             <div class="dialog-next" id="dialogNext">▼</div>
           </div>
         </div>
-        <p class="hint">Click the box or press <kbd>Space</kbd> to continue · <b>◀ Back</b> or <kbd>←</kbd> to go back</p>
+        <p class="hint" data-i18n-html>Click the box or press <kbd>Space</kbd> to continue · <b>◀ Back</b> or <kbd>←</kbd> to go back</p>
         <ol class="chapters panel" id="chapterList"></ol>
       </div>
     </section>
@@ -190,7 +191,7 @@
             <li><span class="time">8:00 PM</span><span class="obj">First dance &amp; party on the dance floor 💃</span></li>
             <li><span class="time">10:30 PM</span><span class="obj">Sparkler send-off ✨ <em>Quest complete!</em></span></li>
           </ol>
-          <p class="note">* Times are placeholders — update in <code>index.html</code>.</p>
+          <p class="note" data-i18n-html>* Times are placeholders — update in <code>index.html</code>.</p>
         </div>
       </div>
 
@@ -199,7 +200,7 @@
         <details><summary>Can I bring a plus-one?</summary><p>Your invitation lists everyone in your party. If it says "and guest," yes! Add them in the RSVP.</p></details>
         <details><summary>Are kids welcome?</summary><p>Please let us know in the RSVP and we'll do our best to accommodate.</p></details>
         <details><summary>Is there parking?</summary><p>Yes — Duke has visitor parking near the Chapel. Details coming soon.</p></details>
-        <details><summary>When should I RSVP by?</summary><p>Please RSVP by <b>March 1, 2027</b>.</p></details>
+        <details><summary>When should I RSVP by?</summary><p data-i18n-html>Please RSVP by <b>March 1, 2027</b>.</p></details>
       </div>
     </section>
 
@@ -216,7 +217,7 @@
         <button class="pin" style="left:38%;top:72%" data-pin="food">🍜<span>Eats</span></button>
         <button class="pin" style="left:82%;top:70%" data-pin="fun">🌳<span>Explore</span></button>
         </div>
-        <div class="map-info parchment" id="mapInfo">Tap a pin on the map 📍</div>
+        <div class="map-info parchment" id="mapInfo" data-i18n-html>Tap a pin on the map 📍</div>
       </div>
 
       <h3 class="section-label">Inventory</h3>
@@ -224,7 +225,7 @@
         <article class="slot panel">
           <div class="slot-icon">✈</div>
           <h4>Flying in</h4>
-          <p>Fly into <b>Raleigh-Durham International (RDU)</b> — about 25 minutes from Duke by car.</p>
+          <p data-i18n-html>Fly into <b>Raleigh-Durham International (RDU)</b> — about 25 minutes from Duke by car.</p>
         </article>
         <article class="slot panel">
           <div class="slot-icon">🏨</div>
@@ -341,6 +342,7 @@
   <script src="story-scenes.js"></script>
   <script src="music-day.js"></script>
   <script src="music-night.js"></script>
+  <script src="i18n.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

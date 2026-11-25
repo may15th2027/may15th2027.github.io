@@ -1,5 +1,7 @@
 (() => {
   const CFG = window.WEDDING_CONFIG;
+  const t = (s, ctx) => (window.I18N ? window.I18N.t(s, ctx) : s); // translate (i18n.js); the rest of the page is translated automatically
+  const tr = t; // same, for places where "t" means something else
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const store = {
@@ -58,6 +60,7 @@
     const say = (who, text) => {
       const m = document.createElement("p");
       m.className = "chat-msg " + who; m.textContent = text;
+      if (who === "me") m.setAttribute("data-no-i18n", ""); // never translate what the visitor typed
       log.appendChild(m); log.scrollTop = log.scrollHeight;
       return m;
     };
@@ -97,12 +100,17 @@
 
   /* ================= ROUTER ================= */
   const screens = ["home", "story", "gallery", "wedding", "travel", "rsvp"];
+  let current = "home";
+  function setTitle() {
+    const names = t("Chin-Yi & Sixuan");
+    document.title = current === "home" ? names : `${$(`#screen-${current} h2`).textContent.trim()} · ${names}`;
+  }
   function show(name) {
     if (!screens.includes(name)) name = "home";
     $$(".screen").forEach((s) => (s.hidden = s.dataset.screen !== name));
     $$(".topnav a").forEach((a) => a.classList.toggle("active", a.dataset.go === name));
     document.body.classList.toggle("sub", name !== "home");
-    document.title = name === "home" ? "Chin-Yi & Sixuan" : `${$(`#screen-${name} h2`).textContent.trim()} · Chin-Yi & Sixuan`;
+    current = name; setTitle();
     window.scrollTo({ top: 0 });
     if (name === "story") story.enter();
     if (name === "gallery") gallery.shelf(); // the Gallery tab always opens on the album shelf
@@ -276,10 +284,10 @@
       ch = i; line = at;
       const c = part(i);
       $("#sceneEmoji").textContent = c.emoji;
-      $("#sceneYear").textContent = c.year || "—";
-      $("#scenePlace").textContent = c.place || "—";
+      $("#sceneYear").textContent = t(c.year) || "—";
+      $("#scenePlace").textContent = t(c.place, "place") || "—";
       $("#vnIcon").textContent = c.emoji;
-      $("#vnNum").textContent = i + 1;
+      $("#vnNum").textContent = `Ch. ${i + 1}`;
       $("#vnName").textContent = c.subtitle;
       renderList(); say(instant);
     }
@@ -313,7 +321,7 @@
           imgOk[t.src] = true;
           if (token !== sceneToken) return;
           photo.src = t.src; photo.className = "scene-photo " + t.kind;
-          photo.alt = t.kind === "portrait" ? speaker : `${speaker}: ${part(ch).lines[line][1]}`;
+          photo.alt = t.kind === "portrait" ? tr(speaker) : `${tr(speaker)}: ${tr(part(ch).lines[line][1])}`;
           photo.hidden = false; emojiEl.hidden = true;
           sceneBox.classList.toggle("has-full", t.kind === "full");
           photo.style.animation = "none"; void photo.offsetWidth; photo.style.animation = "";
@@ -372,10 +380,10 @@
     function say(instant = false) {
       setScene();
       const [name, txt, , place] = part(ch).lines[line];
-      $("#scenePlace").textContent = place || part(ch).place || "—"; // each sentence has its own place
+      $("#scenePlace").textContent = t(place || part(ch).place, "place") || "—"; // each sentence has its own place
       setPortrait(name);
       backBtn.hidden = ch === 0 && line === 0; // nothing before the very first line
-      who.textContent = name; full = txt; textEl.textContent = "";
+      who.textContent = t(name); full = t(txt); textEl.textContent = "";
       let k = 0; clearInterval(typing); typing = null;
       if (instant) { textEl.textContent = full; return; } // going back: show the whole line at once
       typing = setInterval(() => {
@@ -394,22 +402,38 @@
           store.set(key(), ch + 2);
           justUnlocked = ch + 1;
           renderList();
-          const n = part(ch + 1);
-          who.textContent = "🔓 Unlocked!"; setPortrait("🔓");
-          textEl.textContent = `Chapter ${ch + 2} unlocked: ${n.emoji} ${n.subtitle}\nClick to continue →`;
-          full = "__goto:" + (ch + 1);
+          showUnlock(ch + 1);
           sfx.fanfare();
         } else {
           load(ch + 1);
         }
       } else {
         // story finished → RSVP pop-up
-        who.textContent = "★"; setPortrait("__end");
-        textEl.textContent = "THE END... of the beginning! ♥";
-        full = "__end";
+        showEnd();
         sfx.fanfare();
         setTimeout(openPop, 500);
       }
+    }
+    function showUnlock(i) {
+      const n = part(i);
+      who.textContent = t("🔓 Unlocked!"); setPortrait("🔓");
+      textEl.textContent = t(`Chapter ${i + 1} unlocked: ${n.emoji} ${n.subtitle}`) + "\n" + t("Click to continue →");
+      full = "__goto:" + i;
+    }
+    function showEnd() {
+      who.textContent = "★"; setPortrait("__end");
+      textEl.textContent = t("THE END... of the beginning! ♥");
+      full = "__end";
+    }
+    // language switched: redraw the open line in the new language
+    function relang() {
+      if (!entered) return;
+      $("#storyTitle").textContent = `— Our story · told by ${viewer} —`;
+      $("#sceneYear").textContent = t(part(ch).year) || "—";
+      clearInterval(typing); typing = null;
+      if (full === "__end") showEnd();
+      else if (full.startsWith("__goto:")) showUnlock(+full.slice(7));
+      else say(true);
     }
     // ◀ Back: previous line; from a chapter's first line, the last line of the chapter before;
     // from the "Unlocked!" / "THE END" box, the last line of the chapter just finished.
@@ -434,7 +458,7 @@
       <div class="pop-box parchment">
         <div class="pop-heart">💌</div>
         <h3 id="popTitle">Story complete!</h3>
-        <p>The next chapter happens at <b>Duke Chapel</b> on <b>May 15, 2027</b> — and we want you in it!</p>
+        <p data-i18n-html>The next chapter happens at <b>Duke Chapel</b> on <b>May 15, 2027</b> — and we want you in it!</p>
         <div class="pop-actions">
           <button type="button" class="btn btn-pink" data-pop="rsvp">✉ RSVP now</button>
           <button type="button" class="btn" data-pop="close">Keep exploring</button>
@@ -466,7 +490,7 @@
       if (e.key === "ArrowLeft" && !backBtn.hidden) { e.preventDefault(); backBtn.click(); }
     });
     let entered = false;
-    return { view, enter: () => { if (!entered) { entered = true; view(viewer); } } };
+    return { view, relang, enter: () => { if (!entered) { entered = true; view(viewer); } } };
   })();
 
   /* ================= GALLERY (albums of real photos in wooden frames) ================= */
@@ -651,7 +675,7 @@
     for (let i = 0; i < n; i++) {
       const row = document.createElement("div");
       row.className = "guest-row";
-      const opts = CFG.mealOptions.map((m) => `<option>${m}</option>`).join("");
+      const opts = CFG.mealOptions.map((m) => `<option value="${esc(m)}">${esc(m)}</option>`).join(""); // value stays English for the sheet
       row.innerHTML = `
         <label>${i === 0 ? "Player 1 (you)" : "Player " + (i + 1)} name
           <input data-guest-name placeholder="Full name" /></label>
@@ -765,5 +789,6 @@
   go(1);
 
   /* ================= INIT ================= */
+  document.addEventListener("langchange", () => { setTitle(); story.relang(); });
   show(location.hash.slice(1) || "home");
 })();

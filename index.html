@@ -26,6 +26,10 @@
 
   <!-- ============ HUD (top-right) ============ -->
   <div class="hud">
+    <button id="fullBtn" class="hud-btn full-btn" type="button" aria-label="Full screen" title="Full screen" hidden>
+      <svg class="fs-in" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 1h5v2H3v3H1zM10 1h5v5h-2V3h-3zM1 10h2v3h3v2H1zM13 10h2v5h-5v-2h3z"/></svg>
+      <svg class="fs-out" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M4 1h2v5H1V4h3zM10 1h2v3h3v2h-5zM1 10h5v5H4v-3H1zM10 10h5v2h-3v3h-2z"/></svg>
+    </button>
     <button id="langBtn" class="hud-btn lang-btn" type="button" data-no-i18n>EN</button>
     <button id="chatBtn" class="hud-btn chat-btn" aria-label="Open chat" aria-expanded="false" aria-controls="chatBox" title="Ask us anything"><span class="pxi pxi-chat"></span></button>
     <button id="soundBtn" class="hud-btn" aria-label="Toggle sound" title="Sound">♪ ON</button>

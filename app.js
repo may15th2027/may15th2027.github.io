@@ -83,6 +83,28 @@
 
   soundBtn.addEventListener("click", () => { soundOn = !soundOn; store.set("sound", soundOn); paintSound(); sfx.blip(); music(); });
 
+  // full-screen button (iPhone Safari doesn't allow web pages to go full screen, so the button stays hidden there)
+  (() => {
+    const btn = $("#fullBtn"), root = document.documentElement;
+    const enter = root.requestFullscreen || root.webkitRequestFullscreen;
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    const current = () => document.fullscreenElement || document.webkitFullscreenElement;
+    if (!enter || !exit) return;
+    btn.hidden = false;
+    const paint = () => {
+      const on = !!current(), label = on ? "Exit full screen" : "Full screen";
+      btn.classList.toggle("on", on);
+      btn.setAttribute("aria-label", label); btn.title = label;
+    };
+    btn.addEventListener("click", () => {
+      sfx.blip();
+      const p = current() ? exit.call(document) : enter.call(root);
+      if (p && p.catch) p.catch(() => {}); // e.g. blocked inside an embedded frame
+    });
+    document.addEventListener("fullscreenchange", paint);
+    document.addEventListener("webkitfullscreenchange", paint);
+  })();
+
   /* ================= BOOT ================= */
   const boot = $("#boot");
   function start() {

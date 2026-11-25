@@ -1,30 +1,19 @@
 // ===== Sticker faces for the dialogue portrait =====
-// Picks assets/narrator/<who>-<mood>.png for each sentence. Key = "<teller>-ch<chapter>-<line>", e.g. "chinyi-ch1-3".
-// (The story pictures themselves come only from assets/story/ — there are no drawn scenes any more.)
+// When a character speaks, their portrait is assets/narrator/<who>-<mood>.png, with the mood picked per line here.
+// (Narrator lines always show assets/narrator/narrator.png, so they need no mood.)
 (() => {
-  /* ---------- Narrator stickers: the storyteller's face for each Narrator line ---------- */
-  // files: assets/narrator/<teller>-<mood>.png
-  //   chinyi: cheer love surprised giggle wink · sixuan: laugh smile surprised thinking lol
-  //   leia: stare happy curious yell grumpy
-  const NARRATOR_DEFAULT = { chinyi: "wink", sixuan: "smile", leia: "stare" };
-  const NARRATOR = {
-    "chinyi-ch1-1": "wink", "chinyi-ch1-3": "surprised",
-    "chinyi-ch2-1": "love", "chinyi-ch2-2": "giggle", "chinyi-ch2-5": "love", "chinyi-ch2-6": "surprised", "chinyi-ch2-9": "giggle",
-    "chinyi-ch3-1": "wink", "chinyi-ch3-2": "cheer",
-    "chinyi-ch4-1": "love", "chinyi-ch4-5": "cheer",
-    "chinyi-ch5-1": "wink",
-    "sixuan-ch1-1": "smile", "sixuan-ch1-2": "laugh", "sixuan-ch1-4": "surprised",
-    "sixuan-ch2-1": "thinking", "sixuan-ch2-3": "smile", "sixuan-ch2-6": "laugh", "sixuan-ch2-7": "surprised",
-    "sixuan-ch3-1": "smile", "sixuan-ch3-2": "thinking", "sixuan-ch3-5": "surprised", "sixuan-ch3-6": "lol",
-    "sixuan-ch4-1": "smile", "sixuan-ch4-5": "lol", "sixuan-ch4-6": "thinking",
-    "sixuan-ch5-1": "laugh",
-    "leia-ch1-1": "stare", "leia-ch2-1": "curious", "leia-ch2-3": "grumpy",
-    "leia-ch3-1": "stare", "leia-ch3-4": "yell",
-    "leia-ch4-1": "curious", "leia-ch4-3": "happy",
-    "leia-ch5-1": "yell",
+  // sticker files: assets/narrator/<who>-<mood>.png
+  const MOODS = {
+    chinyi: ["cheer", "love", "surprised", "giggle", "wink"],
+    sixuan: ["laugh", "smile", "surprised", "thinking", "lol"],
+    leia: ["stare", "happy", "curious", "yell", "grumpy"],
   };
-  // lines spoken by a character: the mood of that speaker's sticker
-  const SPOKEN = {
+  // used when a line has no mood below, or a mood that speaker doesn't have
+  const DEFAULT = { chinyi: "wink", sixuan: "smile", leia: "stare" };
+
+  // the speaker's mood for each line. Key = "<teller>-ch<chapter>-<line>", e.g. "chinyi-ch1-2" =
+  // Chin-Yi's version of the story, chapter 1, line 2 (count every line, Narrator lines too).
+  const MOOD = {
     "chinyi-ch1-2": "surprised", "chinyi-ch1-4": "surprised",
     "chinyi-ch2-3": "cheer", "chinyi-ch2-4": "laugh", "chinyi-ch2-7": "surprised", "chinyi-ch2-8": "smile",
     "chinyi-ch3-3": "smile", "chinyi-ch3-4": "giggle",
@@ -40,17 +29,11 @@
     "leia-ch1-2": "stare", "leia-ch2-2": "yell", "leia-ch3-2": "stare", "leia-ch3-3": "grumpy",
     "leia-ch4-2": "grumpy", "leia-ch4-5": "yell", "leia-ch5-2": "happy", "leia-ch5-3": "yell",
   };
-  const MOODS = {
-    chinyi: ["cheer", "love", "surprised", "giggle", "wink"],
-    sixuan: ["laugh", "smile", "surprised", "thinking", "lol"],
-    leia: ["stare", "happy", "curious", "yell", "grumpy"],
-  };
-  // key = "<teller>-ch<N>-<line>", who = whose sticker set to use (speaker, or teller for Narrator)
+
+  // key = "<teller>-ch<N>-<line>", who = the speaker ("chinyi" / "sixuan" / "leia")
   const face = (key, who) => {
     if (!MOODS[who]) return null;
-    const teller = key.split("-")[0];
-    let mood = who === teller && NARRATOR[key] ? NARRATOR[key] : SPOKEN[key];
-    if (!MOODS[who].includes(mood)) mood = NARRATOR_DEFAULT[who];
+    const mood = MOODS[who].includes(MOOD[key]) ? MOOD[key] : DEFAULT[who];
     return `assets/narrator/${who}-${mood}.png`;
   };
 

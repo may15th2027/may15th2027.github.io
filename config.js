@@ -6,7 +6,7 @@ window.WEDDING_CONFIG = {
   // Paste your Google Apps Script Web App URL here to save RSVPs to a Google Sheet.
   // See google-apps-script.gs for setup steps. Leave empty to test locally
   // (RSVPs are then only saved in this browser).
-  rsvpEndpoint: "",
+  rsvpEndpoint: "https://script.google.com/macros/s/AKfycbwfMhNgl21xZMbNrTamUTV7hF6SeNRYd0TXeth_3BAhaSgHN8SimfVtKl6GxJ3k2hz4iQ/exec",
 
   maxGuests: 6,
   mealOptions: ["Chicken", "Fish", "Vegetarian", "Kids meal"],

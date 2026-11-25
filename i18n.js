@@ -80,8 +80,7 @@
     ["— Choose your character —", "— 選擇你的角色 —", "— 选择你的角色 —"],
     ["— Chapter select —", "— 選擇章節 —", "— 选择章节 —"],
     ["Class:", "職業：", "职业："],
-    ["Origin", "出身", "出身"],
-    ["Special Skill", "特殊技能", "特殊技能"],
+    ["Origin", "家鄉", "出身"],
     ["personality", "個性", "个性"],
     ["Yilan, Taiwan", "台灣宜蘭", "台湾宜兰"],
     ["Chunhua, China", "中國淳化", "中国淳化"],
@@ -92,20 +91,7 @@
     ["♥ TELLING THE STORY ♥", "♥ 正在講故事 ♥", "♥ 正在讲故事 ♥"],
     ["Chemist", "化學家", "化学家"],
     ["Computer Scientist", "電腦科學家", "计算机科学家"],
-    ["Quest Companion", "冒險夥伴", "冒险伙伴"],
-    ["Taiwan 🇹🇼", "台灣 🇹🇼", "台湾 🇹🇼"],
-    ["China 🇨🇳", "中國 🇨🇳", "中国 🇨🇳"],
-    ["Home 🏡", "家 🏡", "家 🏡"],
     ["Overthinking", "想太多", "想太多"],
-    ["Problem Solving", "解決問題", "解决问题"],
-    ["Napping Anywhere", "隨地睡午覺", "随地睡午觉"],
-    ["Intelligence", "智力", "智力"],
-    ["Curiosity", "好奇心", "好奇心"],
-    ["Patience", "耐心", "耐心"],
-    ["Communication", "溝通", "沟通"],
-    ["Cuteness", "可愛度", "可爱度"],
-    ["Fluffiness", "蓬鬆度", "蓬松度"],
-    ["Obedience", "聽話度", "听话度"],
     ["STR", "力量", "力量"],
     ["DEX", "敏捷", "敏捷"],
     ["CON", "體質", "体质"],
@@ -429,7 +415,7 @@
   ];
 
   // ---------- text with a changing part ($1, $2 = the changing part, itself translated) ----------
-  const PM = (m, L) => { const h = +m[1]; return (L === "zh-Hant" ? (h >= 6 && h < 12 ? "晚上" : "下午") : (h >= 6 && h < 12 ? "晚上" : "下午")) + ` ${m[1]}:${m[2]}`; };
+  const PM = (m) => `${+m[1] >= 6 && +m[1] < 12 ? "晚上" : "下午"} ${m[1]}:${m[2]}`; // 6:30 PM → 晚上 6:30, 3:30 PM → 下午 3:30
   const PATTERNS = [
     [/^(.*?)\s*Chapter (\d+)$/, "$1 第 $2 章", "$1 第 $2 章"],
     [/^Ch\. (\d+)$/, "第 $1 章", "第 $1 章"],
@@ -437,7 +423,6 @@
     [/^— Our story · told by (.+) —$/, "— 我們的故事 · 由$1講述 —", "— 我们的故事 · 由$1讲述 —"],
     [/^▶ See the story as (.+)$/, "▶ 用$1的視角看故事", "▶ 用$1的视角看故事"],
     [/^Pixel portrait of (.+)$/, "$1的像素肖像", "$1的像素肖像"],
-    [/^(\d) out of 5$/, "$1／5 顆星", "$1／5 颗星"],
     [/^Step (\d+)\/(\d+)$/, "第 $1/$2 步", "第 $1/$2 步"],
     [/^(\d+) photos?$/, "$1 張照片", "$1 张照片"],
     [/^Open album: (.+)$/, "打開相簿：$1", "打开相册：$1"],

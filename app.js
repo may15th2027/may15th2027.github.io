@@ -226,7 +226,6 @@
     card.setAttribute("role", "button"); card.tabIndex = 0;
     card.setAttribute("aria-pressed", "false");
     const ig = String(c.ig || "").trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//i, "").replace(/\/.*$/, "");
-    const stars = (n) => `<span class="stars" aria-label="${n} out of 5">${"★".repeat(n)}<i>${"★".repeat(5 - n)}</i></span>`;
     card.innerHTML = `
       <span class="char-tag">${esc(c.tag || "P" + (i + 1))}</span>
       <div class="char-head">
@@ -241,7 +240,7 @@
         <dt>personality</dt><dd>${esc(c.skill)}</dd>
         ${ig ? `<dt>IG</dt><dd><a class="char-ig" href="https://www.instagram.com/${encodeURIComponent(ig)}/" target="_blank" rel="noopener" data-no-i18n>@${esc(ig).replace(/_/g, "_<wbr>")} ↗</a></dd>` : ""}
       </dl>
-      ${Array.isArray(c.stats) ? `<ul class="char-stats">${c.stats.map(([k, n]) => `<li><span>${esc(k)}</span>${stars(n)}</li>`).join("")}</ul>` : hexStats(c.stats)}
+      ${hexStats(c.stats || {})}
       <span class="char-play">▶ See the story as ${esc(c.name)}</span>
       <span class="char-select">♥ TELLING THE STORY ♥</span>`;
     card.addEventListener("click", (e) => {

@@ -11,23 +11,25 @@ window.WEDDING_CONFIG = {
   maxGuests: 6,
   mealOptions: ["Chicken", "Fish", "Vegetarian", "Kids meal"],
 
-  // ---- Character cards (top of "Our Story") — stars are out of 5 ----
+  // ---- Character cards (top of "Our Story") ----
+  // stats = the six RPG stats on the hexagon chart, each 1–10:
+  //   STR strength · DEX dexterity · CON constitution · INT intelligence · WIS wisdom · CHA charisma
   // Clicking a card retells the SAME story from that character's point of view.
   characters: [
     {
       name: "Chin-Yi", emoji: "👩", photo: "assets/chinyi.png", tag: "P1",
-      className: "Scientist", origin: "Taiwan 🇹🇼", skill: "Overthinking",
-      stats: [["Intelligence", 5], ["Curiosity", 5], ["Patience", 3]],
+      className: "Chemist", origin: "Yilan, Taiwan", skill: "Spontaneous",
+      stats: { STR: 7, DEX: 7, CON: 9, INT: 9, WIS: 6, CHA: 10 },
     },
     {
       name: "Sixuan", emoji: "👨", photo: "assets/sixuan.png", tag: "P2",
-      className: "Computer Scientist", origin: "China 🇨🇳", skill: "Problem Solving",
-      stats: [["Intelligence", 5], ["Patience", 5], ["Communication", 4]],
+      className: "Computer Scientist", origin: "Chunhua, China", skill: "Overthinking",
+      stats: { STR: 10, DEX: 7, CON: 9, INT: 9, WIS: 6, CHA: 9 },
     },
     {
       name: "Leia", emoji: "🐱", photo: "assets/leia.png", tag: "P3", nameIcon: "🐾",
-      className: "Quest Companion", origin: "Home 🏡", skill: "Napping Anywhere",
-      stats: [["Cuteness", 5], ["Fluffiness", 5], ["Obedience", 1]],
+      className: "Boss", origin: "State College, USA", skill: "Having affair with DK and Square",
+      stats: { STR: 5, DEX: 10, CON: 6, INT: 3, WIS: 10, CHA: 10 },
     },
   ],
 

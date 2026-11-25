@@ -193,6 +193,32 @@
   /* ================= CHARACTER CARDS ================= */
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const party = $("#party");
+  // six RPG stats (1–10) drawn as a hexagon chart; hover / long-press a stat for what it means
+  const STATS = [
+    ["STR", "Strength (STR) — body & drive: fitness, stamina for hard work, getting things done."],
+    ["DEX", "Dexterity (DEX) — quick hands & reflexes: coordination, thinking on your feet, efficiency."],
+    ["CON", "Constitution (CON) — energy & resilience: staying power, rarely sick, keeps calm under long stress."],
+    ["INT", "Intelligence (INT) — logic & learning: reasoning, expertise, analysing problems, learning fast."],
+    ["WIS", "Wisdom (WIS) — insight & calm: empathy, intuition, reading the room, staying steady in chaos."],
+    ["CHA", "Charisma (CHA) — social magic: charm, way with words, leadership, makes friends anywhere."],
+  ];
+  function hexStats(st) {
+    const R = 62, pt = (i, r) => { const a = (Math.PI / 3) * i - Math.PI / 2; return [+(r * Math.cos(a)).toFixed(1), +(r * Math.sin(a)).toFixed(1)]; };
+    const ring = (f) => STATS.map((_, i) => pt(i, R * f).join(",")).join(" ");
+    const val = (k) => Math.max(0, Math.min(10, +st[k] || 0));
+    const shape = STATS.map(([k], i) => pt(i, (R * val(k)) / 10).join(",")).join(" ");
+    const axes = STATS.map((_, i) => { const [x, y] = pt(i, R); return `<line x1="0" y1="0" x2="${x}" y2="${y}"/>`; }).join("");
+    const labels = STATS.map(([k, tip], i) => {
+      const [x, y] = pt(i, R + 20), anchor = Math.abs(x) < 5 ? "middle" : x > 0 ? "start" : "end";
+      const [dx, dy] = pt(i, (R * val(k)) / 10);
+      return `<g class="hex-stat"><title>${esc(tip)}</title>` +
+        `<rect class="hex-dot" x="${dx - 3}" y="${dy - 3}" width="6" height="6"/>` +
+        `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle"><tspan class="hex-k">${k}</tspan><tspan class="hex-v" dx="4">${val(k)}</tspan></text></g>`;
+    }).join("");
+    return `<svg class="char-hex" viewBox="-118 -92 236 184" role="img" aria-label="${STATS.map(([k]) => `${k} ${val(k)}`).join(", ")}">` +
+      `<g class="hex-grid">${[1, .8, .6, .4, .2].map((f) => `<polygon points="${ring(f)}"/>`).join("")}${axes}</g>` +
+      `<polygon class="hex-shape" points="${shape}"/>${labels}</svg>`;
+  }
   (CFG.characters || []).forEach((c, i) => {
     const card = document.createElement("button");
     card.type = "button";
@@ -210,9 +236,9 @@
       </div>
       <dl class="char-info">
         <dt>Origin</dt><dd>${esc(c.origin)}</dd>
-        <dt>Special Skill</dt><dd>${esc(c.skill)}</dd>
+        <dt>personality</dt><dd>${esc(c.skill)}</dd>
       </dl>
-      <ul class="char-stats">${c.stats.map(([k, n]) => `<li><span>${esc(k)}</span>${stars(n)}</li>`).join("")}</ul>
+      ${Array.isArray(c.stats) ? `<ul class="char-stats">${c.stats.map(([k, n]) => `<li><span>${esc(k)}</span>${stars(n)}</li>`).join("")}</ul>` : hexStats(c.stats)}
       <span class="char-play">▶ See the story as ${esc(c.name)}</span>
       <span class="char-select">♥ TELLING THE STORY ♥</span>`;
     card.addEventListener("click", () => {

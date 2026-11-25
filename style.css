@@ -257,7 +257,7 @@ body:not(.sub) .topnav { display: none; }
   .hero-art { position: relative; aspect-ratio: 4 / 3; }
   .hero-img { object-position: 50% 0; }
   .hot { left: var(--ml, var(--l)); width: var(--mw, var(--w)); }
-  .hot-mailbox, .signpost { display: none; }
+  .hot-mailbox, .hot-sign, .signpost { display: none; }
   .speech { left: 56%; font-size: 14px; transform: translate(-50%, -100%) scale(.8); }
   .speech.show { transform: translate(-50%, -100%) scale(1); }
   .bigday { position: relative; inset: auto; width: auto; margin: 40px 20px 0; padding: 18px 20px 20px; font-size: 19px;
@@ -863,3 +863,15 @@ html:lang(zh-Hans) { --font: "Pixelify Sans", "VT323", "Microsoft YaHei", "PingF
   .lb-list { max-height: 30vh; }
 }
 @media (max-width: 520px) { .note-wall { grid-template-columns: 1fr; } }
+
+/* ===== character cards: six-stat hexagon chart (STR DEX CON INT WIS CHA, 1–10) ===== */
+.char-hex { display: block; width: 100%; max-width: 280px; margin: 2px auto 6px; overflow: visible; }
+.hex-grid polygon { fill: none; stroke: #d9bf8c; stroke-width: 1; }
+.hex-grid polygon:first-child { fill: rgba(217,191,140,.18); stroke: var(--wood); stroke-width: 2; }
+.hex-grid line { stroke: #d9bf8c; stroke-width: 1; stroke-dasharray: 2 3; }
+.hex-shape { fill: rgba(232,80,91,.38); stroke: var(--pink-dark); stroke-width: 2.5; stroke-linejoin: round; }
+.hex-dot { fill: var(--pink-dark); stroke: #fff; stroke-width: 1; }
+.hex-stat text { font: 700 15px var(--font); fill: var(--ink); }
+.hex-stat .hex-v { fill: var(--pink-dark); font-size: 15px; }
+.hex-stat { cursor: help; }
+.hex-stat:hover text { fill: var(--pink-dark); }

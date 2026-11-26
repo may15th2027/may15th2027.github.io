@@ -34,7 +34,7 @@ window.WEDDING_CONFIG = {
       name: "Leia", emoji: "🐱", photo: "assets/leia.png", tag: "P3", nameIcon: "🐾",
       className: "Boss", origin: "State College, USA", skill: "Having affair with DK and Square", ig: "leia_the_little_princess",
       likes: "Chin-Yi 💕, Treat 🐟", hates: "Sixuan 😾, Thunder ⛈️",
-      stats: { STR: 5, DEX: 10, CON: 6, INT: 3, WIS: 10, CHA: 10 },
+      stats: { STR: 5, DEX: 10, CON: 6, INT: 3, WIS: 5, CHA: 10 },
     },
   ],
 

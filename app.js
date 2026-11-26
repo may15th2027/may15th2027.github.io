@@ -49,7 +49,23 @@
     const want = nightMode ? night : day, other = nightMode ? day : night;
     other.stop();
     if (on) want.play(audio()); else want.stop();
+    if (navigator.mediaSession) navigator.mediaSession.playbackState = on ? "playing" : "paused";
   }
+  // the music card on the phone's lock screen / control center: our cover picture and title, and its ▶ / ❚❚ work like the ♪ button
+  function mediaCard() {
+    if (!navigator.mediaSession || !window.MediaMetadata) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: t("Our Wedding Adventure"), artist: t("Chin-Yi & Sixuan"),
+      artwork: [{ src: new URL("assets/cover.jpg", location.href).href, sizes: "512x512", type: "image/jpeg" }],
+    });
+  }
+  try {
+    mediaCard();
+    navigator.mediaSession.setActionHandler("play", () => setSound(true));
+    navigator.mediaSession.setActionHandler("pause", () => setSound(false));
+  } catch {}
+  document.addEventListener("langchange", mediaCard);
+  function setSound(v) { soundOn = v; store.set("sound", soundOn); paintSound(); music(); }
   function setNight(v) { if (nightMode === v) return; nightMode = v; if (window.BGM_DAY && (BGM_DAY.playing || BGM_NIGHT.playing)) music(); }
   // Safari only lets sound start inside a finished tap/click (touchend / click), not on pointerdown
   // like Chrome does, so listen to all of them and keep trying until the audio is really running.
@@ -90,7 +106,7 @@
     });
   })();
 
-  soundBtn.addEventListener("click", () => { soundOn = !soundOn; store.set("sound", soundOn); paintSound(); sfx.blip(); music(); });
+  soundBtn.addEventListener("click", () => { setSound(!soundOn); sfx.blip(); });
 
   // full-screen button (iPhone Safari doesn't allow web pages to go full screen, so the button stays hidden there)
   (() => {

@@ -421,6 +421,7 @@
     // inside a version, finishing a chapter unlocks the next.
     function view(name, scroll) {
       viewer = name;
+      entered = true; $("#storyLayout").hidden = false; // the story only starts once a character is picked
       $$(".char", party).forEach((x, i) => {
         const on = CFG.characters[i].name === viewer;
         x.classList.toggle("picked", on); x.setAttribute("aria-pressed", on);
@@ -680,13 +681,14 @@
       advance();
     });
     window.addEventListener("keydown", (e) => {
-      if ($("#screen-story").hidden || !pop.hidden) return;
+      if (!entered || $("#screen-story").hidden || !pop.hidden) return;
       if (e.target !== dlg && e.target.closest && e.target.closest("button, a, input, textarea, select, [role=button]")) return;
       if (e.key === " " || e.key === "Enter" || e.key === "ArrowRight") { e.preventDefault(); dlg.click(); }
       if (e.key === "ArrowLeft" && !backBtn.hidden) { e.preventDefault(); backBtn.click(); }
     });
     let entered = false;
-    return { view, relang, enter: () => { if (!entered) { entered = true; view(viewer); } } };
+    // opening the tab doesn't start a story: the guest picks a character first (that calls view())
+    return { view, relang, enter: () => {} };
   })();
 
   /* ================= GUEST MESSAGES (Forum + comments under gallery photos) ================= */

@@ -997,12 +997,12 @@
   const pinInfo = {
     airport: "✈ <b>RDU Airport</b> — Raleigh-Durham International. ~25 min drive to Duke.",
     chapel: "⛪ <b>Duke Chapel</b> — 401 Chapel Dr, Durham. Ceremony location! <a href='https://maps.google.com/?q=Duke+Chapel' target='_blank' rel='noopener'>Directions ↗</a>",
-    hotel: "🏨 <b>Hotels</b> — Room block details coming soon. Stay near campus or downtown Durham.",
-    food: "🍜 <b>Eats</b> — Downtown Durham has amazing food: BBQ, ramen, biscuits, and more.",
-    home: "🏡 <b>Home</b> — Where Chin-Yi, Sixuan and Leia live. Our little base camp in Durham!",
+    hotel: "🏢 <b>Durham Downtown</b> — A lively hub for dining, shopping, arts, and local culture.",
+    food: "🍽️ <b>Parizade</b> — One of the oldest restaurants in Durham. It features a Mediterranean style menu and will host the cocktail hour, reception dinner and dance party.",
+    home: "🏡 <b>Home</b> — Where Chin-Yi, Sixuan and Leia live. Our little base camp in Durham! Sorry, Jeffrey.",
     chapelhill: "🎓 <b>Chapel Hill</b> — Home of UNC. A cute college town with cafés and shops on Franklin Street, about 20 min from Duke.",
-    airbnb: "🏠 <b>Airbnb</b> — Coming with family or friends? A rental house around the Triangle can be a great choice.",
-    cary: "🏘️ <b>Cary</b> — A quiet, friendly town with lovely parks and plenty of hotels close to RDU and I-40.",
+    airbnb: "🏠 <b>Party House</b> — A big house with a basketball court, fire pit, and 6 bedrooms. The after party will be here! About 30 min from Duke.",
+    cary: "🏘️ <b>Cary</b> — A quiet, friendly town with lovely parks and shops close to RDU and I-40. Fun fact: Cary is a sister city of Hsinchu!",
     raleigh: "🏛️ <b>Raleigh</b> — North Carolina's capital: free museums, food halls and the State Capitol. About 35 min from Duke.",
   };
   // Clicking a place opens a pop-up with its photo and description.

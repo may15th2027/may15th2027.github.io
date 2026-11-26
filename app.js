@@ -47,8 +47,8 @@
     if (!day || !night) return;
     const on = soundOn && !document.hidden;
     const want = nightMode ? night : day, other = nightMode ? day : night;
-    other.stop();                        // short fade out...
-    if (on) want.play(audio()); else want.stop(); // ...while the other one fades in
+    other.stop();
+    if (on) want.play(audio()); else want.stop();
   }
   function setNight(v) { if (nightMode === v) return; nightMode = v; if (window.BGM_DAY && (BGM_DAY.playing || BGM_NIGHT.playing)) music(); }
   // Safari only lets sound start inside a finished tap/click (touchend / click), not on pointerdown
@@ -143,8 +143,7 @@
     document.body.classList.toggle("sub", name !== "home");
     current = name; setTitle();
     window.scrollTo({ top: 0 });
-    if (name === "story") story.enter();
-    if (name === "gallery") gallery.shelf(); // the Gallery tab always opens on the album shelf
+    if (name === "gallery") gallery.shelf();
     if (name === "board") board.enter();
   }
   document.addEventListener("click", (e) => {
@@ -171,7 +170,7 @@
     art.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
       if (e.target.closest("a, button, .speech")) return; // clicks on the cat / mailbox / banner still work as before
-      e.preventDefault(); // no image drag or text selection while holding
+      e.preventDefault();
       art.classList.add("night"); setNight(true);
     });
     window.addEventListener("pointerup", day);
@@ -237,7 +236,7 @@
     btn.addEventListener("click", open);
     pop.addEventListener("click", (e) => {
       if (e.target === pop || e.target.closest(".news-close")) { sfx.blip(); close(); }
-      else if (e.target.closest("[data-go]")) { pop.hidden = true; anim && anim.play(); } // the page switch itself is done by the [data-go] handler
+      else if (e.target.closest("[data-go]")) { pop.hidden = true; anim && anim.play(); }
     });
     window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) close(); });
     document.addEventListener("langchange", () => { if (anim) anim.cancel(); i = Math.max(0, i - 1); next(); if (!pop.hidden) fill(); });
@@ -248,8 +247,8 @@
   const catSpeech = $("#catSpeech");
   const TALK = {
     // sx / sy = where the bubble sits (% of the picture), tx = which way it grows, msx = bubble spot on phones
-    leia: { sx: "50%", sy: "66%", tx: "-10%", msx: "56%", lines: [" Meow! I'm Leia. Did you bring my treats? 🐾", "Purrr... try clicking the background for a surprise! 💕", "*knocks your phone off the table*", "Mrrp! I'm the ring bearer. 💍"] },
-    chinyi: { sx: "46%", sy: "60%", tx: "-90%", msx: "44%", lines: ["Hi! I'm Chin-Yi. Welcome to our adventure! 💕", "I just adopted a cat! 🐱", "HSixuan has bought 4 old cars...🙄", "...and he keeps forgetting about his Mazda 6! 🚗"] },
+    leia: { sx: "50%", sy: "66%", tx: "-10%", msx: "56%", lines: ["Meow! I'm Leia. Did you bring my treats? 🐾", "Purrr... try clicking the background for a surprise! 💕", "*knocks your phone off the table*", "Mrrp! I'm the ring bearer. 💍"] },
+    chinyi: { sx: "46%", sy: "60%", tx: "-90%", msx: "44%", lines: ["Hi! I'm Chin-Yi. Welcome to our adventure! 💕", "I just adopted a cat! 🐱", "Sixuan has bought 4 old cars...🙄", "...and he keeps forgetting about his Mazda 6! 🚗"] },
     sixuan: { sx: "51.5%", sy: "59%", tx: "-10%", msx: "52%", lines: ["Hey! I'm Sixuan. Welcome! 👋", "You thought the Miata was my last car? 🏎️", "Then I bought a Ranger... 🛻", "...and then I got a 1995 Jeep! 🚙"] },
   };
   const talkI = {};
@@ -329,7 +328,7 @@
     window.addEventListener("resize", follow);
     window.addEventListener("hashchange", hide);
     document.addEventListener("langchange", () => { if (on) show(on); });
-    return { toggle: (g, type) => (type !== "mouse" && on === g ? hide() : show(g)), hide };
+    return { toggle: (g, type) => (type !== "mouse" && on === g ? hide() : show(g)) };
   })();
   (CFG.characters || []).forEach((c, i) => {
     // (a clickable box rather than a <button>, so the Instagram link can sit inside it)
@@ -358,7 +357,7 @@
       <span class="char-play">▶ See the story as ${esc(c.name)}</span>
       <span class="char-select">♥ TELLING THE STORY ♥</span>`;
     card.addEventListener("click", (e) => {
-      if (e.target.closest("a")) return; // the IG link opens Instagram instead
+      if (e.target.closest("a")) return;
       const st = e.target.closest(".hex-stat");
       if (st) { statTip.toggle(st, e.pointerType || "mouse"); return; } // a stat ("?" cursor) only shows its meaning
       sfx.select();
@@ -382,10 +381,9 @@
   const story = (() => {
     const list = $("#chapterList"), textEl = $("#dialogText"), who = $("#speaker"), dlg = $("#dialog"), backBtn = $("#dialogBack");
     const chapters = CFG.story;
-    let viewer = CFG.characters[0].name; // every version belongs to a character; first one by default
+    let viewer = CFG.characters[0].name;
     let ch = 0, line = 0, typing = null, full = "";
 
-    // chapter as told by the current character
     const part = (i, v = viewer) => {
       const base = chapters[i], o = (base.views && base.views[v]) || {};
       return { emoji: o.emoji || "📖", subtitle: o.subtitle || base.moment || "", year: o.year || "",
@@ -417,8 +415,6 @@
         li.appendChild(r); list.appendChild(li);
       }
     }
-    // Switch to a character's version. Each version is independent;
-    // inside a version, finishing a chapter unlocks the next.
     function view(name, scroll) {
       viewer = name;
       entered = true; $("#storyLayout").hidden = false; // the story only starts once a character is picked
@@ -454,12 +450,11 @@
     const photo = $("#scenePhoto"), emojiEl = $("#sceneEmoji"), sceneBox = $("#sceneBox");
     const slug = (n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, "");
     let sceneToken = 0;
-    const imgOk = {}; // remembers which picture files exist
-    // the pictures to try for one sentence, best first
+    const imgOk = {};
     function sceneTries(c, l) {
       const [speaker, , pic] = part(c).lines[l];
       const base = `assets/story/${slug(viewer)}-ch${c + 1}-${l + 1}`;
-      const chapterBase = `assets/story/${slug(viewer)}-ch${c + 1}`; // one picture for the whole chapter
+      const chapterBase = `assets/story/${slug(viewer)}-ch${c + 1}`;
       const portrait = (charOf(speaker) || {}).photo;
       return [pic && { src: pic, kind: "full" },
               { src: base + ".png", kind: "full" }, { src: base + ".jpg", kind: "full" },
@@ -487,7 +482,7 @@
             photo.alt = t.kind === "portrait" ? tr(speaker) : `${tr(speaker)}: ${tr(part(ch).lines[line][1])}`;
             photo.hidden = false; emojiEl.hidden = true;
             sceneBox.classList.toggle("has-full", t.kind === "full");
-            if (same) return done(); // same picture as before: nothing to wait for
+            if (same) return done();
             photo.style.animation = "none"; void photo.offsetWidth; photo.style.animation = "";
             setTimeout(done, 350); // .scene-photo pop-in animation
           };
@@ -512,7 +507,6 @@
       };
       attempt(0);
     }
-    // resolves when the face in the dialogue box has loaded (or failed)
     function portraitReady() {
       const im = $("#dlgPortrait img");
       if (!im || im.complete) return Promise.resolve();
@@ -570,9 +564,9 @@
     function say(instant = false) {
       const sceneShown = setScene();
       const [name, txt, , place] = part(ch).lines[line];
-      $("#scenePlace").textContent = t(place || part(ch).place, "place") || "—"; // each sentence has its own place
+      $("#scenePlace").textContent = t(place || part(ch).place, "place") || "—";
       const faceShown = setPortrait(name);
-      backBtn.hidden = ch === 0 && line === 0; // nothing before the very first line
+      backBtn.hidden = ch === 0 && line === 0;
       who.textContent = t(name); full = t(txt); textEl.textContent = "";
       clearInterval(typing); typing = null;
       preloadNext();
@@ -596,10 +590,8 @@
     function advance() {
       if (typing) { clearInterval(typing); typing = null; textEl.textContent = full; return; }
       if (line < part(ch).lines.length - 1) { line++; say(); return; }
-      // chapter finished → unlock the next chapter of this story
       if (ch < chapters.length - 1) {
         if (unlocked() < ch + 2) {
-          // newly unlocked: announce it in the dialogue box, flash it in the chapter list
           store.set(key(), ch + 2);
           justUnlocked = ch + 1;
           renderList();
@@ -691,8 +683,7 @@
       if (e.key === "ArrowLeft" && !backBtn.hidden) { e.preventDefault(); backBtn.click(); }
     });
     let entered = false;
-    // opening the tab doesn't start a story: the guest picks a character first (that calls view())
-    return { view, relang, enter: () => {} };
+    return { view, relang };
   })();
 
   /* ================= GUEST MESSAGES (Forum + comments under gallery photos) ================= */
@@ -700,8 +691,7 @@
   // sends them back so every visitor sees them. Without it (testing), they're kept in this browser only.
   const notes = (() => {
     const API = CFG.messagesEndpoint || CFG.rsvpEndpoint;
-    // Everything is read fresh from the Google Sheet each time (no copies kept in the browser).
-    try { localStorage.removeItem("notes-mine"); } catch (e) {} // (an older version kept copies here)
+    try { localStorage.removeItem("notes-mine"); } catch (e) {}
     let data = null, loading = null, status = API ? "loading" : "offline";
     const subs = [];
     const emit = () => subs.forEach((f) => f(data));
@@ -784,7 +774,7 @@
       });
     }
     $$("[data-notes-local]").forEach((x) => (x.hidden = !!API));
-    return { load, post, wire, date, on: (f) => subs.push(f), get data() { return data; }, get status() { return status; } };
+    return { load, wire, date, on: (f) => subs.push(f), get data() { return data; }, get status() { return status; } };
   })();
 
   /* ================= MESSAGE BOARD ================= */
@@ -1218,8 +1208,7 @@
     $("#rsvpDone").hidden = true; form.hidden = false; go(1); sfx.blip();
   });
 
-  // Forms never remember what was typed before: every visit starts empty, showing the grey example text.
-  // (Older versions saved the name / last RSVP on the device: remove those copies.)
+  // forms start empty every visit; remove names / RSVPs that older versions saved on the device
   try { localStorage.removeItem("guest-name"); localStorage.removeItem("my-rsvp"); } catch (e) {}
   go(1);
 

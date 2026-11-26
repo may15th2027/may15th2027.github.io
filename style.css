@@ -12,7 +12,6 @@
   --sky-1: #6f6ad6;
   --sky-2: #c58fd8;
   --sky-3: #f6b0a6;
-  --grass: #7cbf4a;
   --px: 4px;
   --font: "Pixelify Sans", "VT323", system-ui, sans-serif;
 }
@@ -245,7 +244,7 @@ body:not(.sub) .topnav { display: none; }
   animation: fall linear infinite; opacity: .9; }
 .petal { transition: background-color .35s, box-shadow .35s; }
 /* night cherry blossoms: used while the title screen shows the night picture (.hero-art.night) */
-.petal-night, .hero-art.night .petal { background: #970404; box-shadow: 4px 4px 0 #f59ab8; }
+.hero-art.night .petal { background: #970404; box-shadow: 4px 4px 0 #f59ab8; }
 @keyframes fall {
   to { transform: translate(var(--drift, 120px), 105vh) rotate(360deg); }
 }
@@ -375,7 +374,6 @@ h3 { font-size: 28px; margin: 0 0 14px; }
 }
 .scene-emoji { font-size: 110px; filter: drop-shadow(6px 6px 0 rgba(0,0,0,.25)); animation: bob 1.6s steps(4) infinite; }
 @keyframes bob { 50% { transform: translateY(-8px); } }
-.scene-meta { position: absolute; left: 12px; bottom: 10px; background: rgba(59,36,20,.85); padding: 4px 10px; font-size: 16px; }
 
 .dialog {
   position: relative; margin: 26px 4px 8px; padding: 30px 26px 26px; min-height: 150px;
@@ -551,7 +549,6 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
 .chapters .restart:hover { opacity: 1; }
 
 /* ---------- story scene picture (changes every sentence) ---------- */
-.scene-meta { z-index: 2; }
 .scene-photo { animation: photoIn .35s steps(5); }
 .scene-photo.full { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .scene-photo.portrait { width: 150px; height: 162px; object-fit: cover; box-shadow: 0 0 0 5px var(--wood-dark), 0 8px 0 4px rgba(0,0,0,.25); }
@@ -566,7 +563,7 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
    illustrations drawn in the same layout.
    ========================================================= */
 .story-layout { display: block !important; }
-.story-layout[hidden] { display: none !important; } /* until a character is picked */
+.story-layout[hidden] { display: none !important; }
 .vn { position: relative; container-type: inline-size; margin: 4px 4px 0; box-shadow: 0 0 0 4px var(--wood-dark), 0 10px 0 4px rgba(0,0,0,.3); background: #3b2414; }
 .vn-crop { position: relative; overflow: hidden; }
 .vn-canvas { position: relative; aspect-ratio: 16 / 9; width: 100%; overflow: hidden; background: #3b2414; }
@@ -631,7 +628,6 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
   .dlg-portrait.narrator { font-size: 36px; }
   .vn .dialog-next { right: 12px; bottom: 8px; }
 }
-/* VN tweaks */
 .vn .nameplate { left: 19.5%; min-width: 10.5cqw; text-align: center; z-index: 3; }
 .vn-badge { width: auto; min-width: 0; max-width: 60%; justify-content: flex-end; gap: 2cqw; padding: 0 1.6cqw; }
 @media (max-width: 700px) { .vn .nameplate { left: 96px; min-width: 0; } .vn-badge { max-width: 70%; } }

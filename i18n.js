@@ -68,20 +68,20 @@
     ["Mailbox: RSVP", "信箱：回覆出席", "信箱：回复出席"],
     ["Heart sign: Forum", "愛心告示牌：留言板", "爱心告示牌：留言板"],
     ["Meow! Did you RSVP yet? 🐾", "喵！你回覆出席了嗎？🐾", "喵！你回复出席了吗？🐾"],
-    ["Meow! I'm Leia. Did you RSVP yet? 🐾", "喵！我是阿咪。你回覆出席了嗎？🐾", "喵！我是阿咪。你回复出席了吗？🐾"],
-    ["Purrr... see you May 15! 💕", "呼嚕嚕……5月15日見！💕", "呼噜噜……5月15日见！💕"],
     ["*knocks your phone off the table*", "*把你的手機推下桌*", "*把你的手机推下桌*"],
     ["Mrrp! I'm the ring bearer. 💍", "咪！我是戒指花童。💍", "咪！我是戒指花童。💍"],
     ["Talk to Chin-Yi", "跟進怡說話", "跟进怡说话"],
     ["Talk to Sixuan", "跟思旋說話", "跟思旋说话"],
     ["Hi! I'm Chin-Yi. Welcome to our adventure! 💕", "嗨！我是進怡，歡迎來到我們的冒險！💕", "嗨！我是进怡，欢迎来到我们的冒险！💕"],
-    ["Don't forget to RSVP — I'm counting heads! 📋", "別忘了回覆出席——我在數人頭喔！📋", "别忘了回复出席——我在数人头哦！📋"],
-    ["Have you read our story yet? 📖", "你看過我們的故事了嗎？📖", "你看过我们的故事了吗？📖"],
-    ["I'm a chemist, and I found the perfect formula: him! 🧪", "我是化學家，我找到了最完美的配方：就是他！🧪", "我是化学家，我找到了最完美的配方：就是他！🧪"],
     ["Hey! I'm Sixuan. Welcome! 👋", "嘿！我是思旋，歡迎！👋", "嘿！我是思旋，欢迎！👋"],
-    ["Yes, this whole website is a game. Of course it is. 🎮", "沒錯，整個網站就是一個遊戲。當然囉。🎮", "没错，整个网站就是一个游戏。当然啰。🎮"],
-    ["Shh... I'm still practicing my vows. 😳", "噓……我還在練習誓詞。😳", "嘘……我还在练习誓词。😳"],
-    ["See you at Duke Chapel on May 15! ⛪", "5月15日杜克教堂見！⛪", "5月15日杜克教堂见！⛪"],
+    ["Meow! I'm Leia. Did you bring my treats? 🐾", "喵！我是阿咪。你有帶我的零食來嗎？🐾", "喵！我是阿咪。你有带我的零食来吗？🐾"],
+    ["Purrr... try clicking the background for a surprise! 💕", "呼嚕嚕……點一下背景試試看，有驚喜喔！💕", "呼噜噜……点一下背景试试看，有惊喜哦！💕"],
+    ["I just adopted a cat! 🐱", "我剛領養了一隻貓！🐱", "我刚领养了一只猫！🐱"],
+    ["Sixuan has bought 4 old cars...🙄", "思旋已經買了4台老車了……🙄", "思旋已经买了4辆老车了……🙄"],
+    ["...and he keeps forgetting about his Mazda 6! 🚗", "……而且他一直忘記自己還有一台Mazda 6！🚗", "……而且他一直忘记自己还有一辆Mazda 6！🚗"],
+    ["You thought the Miata was my last car? 🏎️", "你以為Miata是我的最後一台車？🏎️", "你以为Miata是我的最后一辆车？🏎️"],
+    ["Then I bought a Ranger... 🛻", "結果我又買了一台Ranger……🛻", "结果我又买了一辆Ranger……🛻"],
+    ["...and then I got a 1995 Jeep! 🚙", "……然後又入手了一台1995年的Jeep！🚙", "……然后又入手了一辆1995年的Jeep！🚙"],
     ["Wedding details", "婚禮資訊", "婚礼信息"],
     ["The Big Day", "大日子", "大日子"],
     ["May 15, 2027", "2027年5月15日", "2027年5月15日"],
@@ -99,7 +99,6 @@
     // our story
     ["Meet the players", "認識玩家", "认识玩家"],
     ["— Choose your character —", "— 選擇你的角色 —", "— 选择你的角色 —"],
-    ["— Chapter select —", "— 選擇章節 —", "— 选择章节 —"],
     ["▲ Pick a character to start the story ▲", "▲ 選一位角色開始故事 ▲", "▲ 选一位角色开始故事 ▲"],
     ["Class:", "職業：", "职业："],
     ["Origin", "家鄉", "出身"],
@@ -612,5 +611,5 @@
   walk(document.body);
   mo.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
 
-  window.I18N = { t, set, get lang() { return lang; } };
+  window.I18N = { t, get lang() { return lang; } };
 })();

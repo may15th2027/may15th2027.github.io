@@ -139,7 +139,7 @@ window.WEDDING_CONFIG = {
           ["Narrator", "...and the other visitors burst into applause for the newly engaged couple! 👏", null, "Grand Teton National Park"],
           ["Chin-Yi", "How did a shy introvert like you dare to propose in front of all these people?! I’m dying of laughter!", null, "Grand Teton National Park"],
         ] },
-        "Leia": { subtitle: "Humans chose me", emoji: "🐾", year: "20XX", place: "Centre County Paws", lines: [
+        "Leia": { subtitle: "Humans chose me", emoji: "🐾", year: "2026", place: "Centre County Paws", lines: [
           ["Narrator", "One day, a very loud couple walked in. Stormy was terrified. She looked up from her shelter bed and studied them carefully.", null, "Centre County Paws"],
           ["Stormy (Leia)", "I hope they can’t find me. Just keep playing with the other cats... I’m scared.", null, "Centre County Paws"],
           ["Stormy (Leia)", "Why does that woman keep staring at me!? Go away. Stop looking at me. I want to go back to my old home... everything here is so scary.", null, "Centre County Paws"],
@@ -150,14 +150,14 @@ window.WEDDING_CONFIG = {
     {
       moment: "A new party member",
       views: {
-        "Chin-Yi": { subtitle: "Our little fluffball", emoji: "🧶", year: "20XX", place: "Centre County Paws", lines: [
+        "Chin-Yi": { subtitle: "Our little fluffball", emoji: "🧶", year: "2026", place: "Centre County Paws", lines: [
           ["Narrator", "Chin-Yi has always loved animals. One day, Sixuan took her to the shelter to spend time with the animals.", null, "Centre County Paws"],
           ["Chin-Yi", "Look at that grey cat... she’s too scared to come out, and she’s skin and bones. I want to adopt her.", null, "Centre County Paws"],
           ["Sixuan", "Should we think about it a bit more?", null, "Centre County Paws"],
           ["Chin-Yi", "She needs us right now! That fat orange cat keeps bullying her.", null, "Centre County Paws"],
           ["Narrator", "They adopted her and named her Leia. Now she eats well and is much healthier, and Chin-Yi is happy!", null, "Home"],
         ] },
-        "Sixuan": { subtitle: "Who’s the boss now?", emoji: "👑", year: "20XX", place: "On the way to the shelter", lines: [
+        "Sixuan": { subtitle: "Who’s the boss now?", emoji: "👑", year: "2026", place: "On the way to the shelter", lines: [
           ["Narrator", "One day, Sixuan noticed Chin-Yi was feeling down, so he took her to the animal shelter to spend time with the animals.", null, "On the way to the shelter"],
           ["Chin-Yi", "I want a cat!", null, "Centre County Paws"],
           ["Sixuan", "Didn’t we just come to play with them? Do you really want to adopt one?", null, "Centre County Paws"],
@@ -169,7 +169,7 @@ window.WEDDING_CONFIG = {
           ["Sixuan", "Then let’s call her Leia! May she be as brave as Princess Leia.", null, "Centre County Paws"],
           ["Chin-Yi", "Sounds great! ♥", null, "Home"],
         ] },
-        "Leia": { subtitle: "A new home", emoji: "✨", year: "20XX", place: "Home", lines: [
+        "Leia": { subtitle: "A new home", emoji: "✨", year: "2026", place: "Home", lines: [
           ["Narrator", "In her new home, Leia slowly relaxed. She slept a lot and caught up on all the sleep she’d lost at the shelter!", null, "Home"],
           ["Leia", "These two humans always stare at me, especially that woman. But life here is pretty sweet, so I’ll put up with it.", null, "Home"],
           ["Narrator", "As time flew by, Leia reached a healthy weight... and found a lot of happiness.", null, "Home"],

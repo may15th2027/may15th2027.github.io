@@ -995,14 +995,14 @@
 
   /* ================= TRAVEL MAP ================= */
   const pinInfo = {
-    airport: "✈ <b>RDU Airport</b> — Raleigh-Durham International. ~25 min drive to Duke.",
+    airport: "✈ <b>RDU Airport</b> — Raleigh-Durham International. ~25 min drive to Duke. Chin-Yi's least favorite spot on the map, too many goodbyes with Sixuan here.",
     chapel: "⛪ <b>Duke Chapel</b> — 401 Chapel Dr, Durham. Ceremony location! <a href='https://maps.google.com/?q=Duke+Chapel' target='_blank' rel='noopener'>Directions ↗</a>",
-    hotel: "🏨 <b>Hotels</b> — Room block details coming soon. Stay near campus or downtown Durham.",
-    food: "🍜 <b>Eats</b> — Downtown Durham has amazing food: BBQ, ramen, biscuits, and more.",
-    home: "🏡 <b>Home</b> — Where Chin-Yi, Sixuan and Leia live. Our little base camp in Durham!",
-    chapelhill: "🎓 <b>Chapel Hill</b> — Home of UNC. A cute college town with cafés and shops on Franklin Street, about 20 min from Duke.",
-    airbnb: "🏠 <b>Airbnb</b> — Coming with family or friends? A rental house around the Triangle can be a great choice.",
-    cary: "🏘️ <b>Cary</b> — A quiet, friendly town with lovely parks and plenty of hotels close to RDU and I-40.",
+    hotel: "🏢 <b>Durham Downtown</b> — A lively hub for dining, shopping, arts, and local culture.",
+    food: "🍽️ <b>Parizade</b> — One of the oldest restaurants in Durham. It features a Mediterranean style menu and will host the cocktail hour, reception dinner and dance party. <a href='https://maps.app.goo.gl/B8QxCbtWU9Mq2k4z5' target='_blank' rel='noopener'>Directions ↗</a>",
+    home: "🏡 <b>Home</b> — Where Chin-Yi, Sixuan and Leia live. Our little base camp in Durham! Sorry, Jeffrey.",
+    chapelhill: "🎓 <b>Chapel Hill</b> — A cute college town with cafés and shops on Franklin Street. Home of Duke's rival UNC, though that hasn't stopped Chin-Yi, Sixuan, and Jeffrey from going to the bars on Franklin Street. About 20 min from Duke.",
+    airbnb: "🏠 <b>Party House</b> — A big house with a basketball court, fire pit, and 6 bedrooms. The after party will be here! About 30 min from Duke. The house is not open to the public, so please RSVP to get the address.",
+    cary: "🏘️ <b>Cary</b> — A quiet, friendly town with lovely parks and shops close to RDU and I-40. Fun fact: Cary is a sister city of Hsinchu, Taiwan!",
     raleigh: "🏛️ <b>Raleigh</b> — North Carolina's capital: free museums, food halls and the State Capitol. About 35 min from Duke.",
   };
   // Clicking a place opens a pop-up with its photo and description.
@@ -1106,25 +1106,43 @@
   const steps = $$(".step", form);
   const prevBtn = $("#prevBtn"), nextBtn = $("#nextBtn"), submitBtn = $("#submitBtn");
   const guestsInput = form.elements.guests;
+  const knowPop = $("#knowPop"), knowPopClose = $("#knowPopClose");
   let step = 1;
+
+  function openKnowPop() {
+    knowPop.hidden = false;
+    knowPopClose.focus();
+  }
+  function closeKnowPop() {
+    knowPop.hidden = true;
+    $('input[name="know"]:checked', form)?.focus({ preventScroll: true });
+  }
+  knowPop.addEventListener("click", (e) => {
+    if (e.target === knowPop || e.target === knowPopClose) { sfx.blip(); closeKnowPop(); }
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !knowPop.hidden) { e.stopPropagation(); sfx.blip(); closeKnowPop(); }
+  });
 
   function attending() { return form.elements.attending.value; }
   function renderGuests() {
     const n = +guestsInput.value;
     const box = $("#guestList");
-    const prev = $$(".guest-row", box).map((r) => ({ n: $("input", r).value, m: $("select", r).value }));
+    const prev = $$(".guest-row", box).map((r) => ({
+      name: $("[data-guest-name]", r).value,
+      dietary: $("[data-guest-dietary]", r).value,
+    }));
     box.innerHTML = "";
     for (let i = 0; i < n; i++) {
       const row = document.createElement("div");
       row.className = "guest-row";
-      const opts = CFG.mealOptions.map((m) => `<option value="${esc(m)}">${esc(m)}</option>`).join(""); // value stays English for the sheet
       row.innerHTML = `
         <label>${i === 0 ? "Player 1 (you)" : "Player " + (i + 1)} name
           <input data-guest-name placeholder="Full name" /></label>
-        <label>Meal<select data-guest-meal>${opts}</select></label>`;
-      const nameIn = $("input", row);
-      nameIn.value = prev[i]?.n ?? (i === 0 ? form.elements.name.value : "");
-      if (prev[i]) $("select", row).value = prev[i].m;
+        <label>Dietary restrictions / allergies
+          <input data-guest-dietary placeholder="Vegetarian, nut allergy, ..." /></label>`;
+      $("[data-guest-name]", row).value = prev[i]?.name ?? (i === 0 ? form.elements.name.value : "");
+      $("[data-guest-dietary]", row).value = prev[i]?.dietary ?? "";
       box.appendChild(row);
     }
   }
@@ -1134,6 +1152,7 @@
   }));
   form.addEventListener("change", (e) => {
     if (e.target.name === "attending") { form.classList.toggle("no", attending() === "no"); sfx.select(); }
+    if (e.target.name === "know") sfx.select();
   });
 
   function validate(n) {
@@ -1142,6 +1161,7 @@
     if (n === 1) {
       if (!form.elements.name.value.trim()) msg = "Please enter your name.";
       else if (!/^\S+@\S+\.\S+$/.test(form.elements.email.value.trim())) msg = "Please enter a valid email.";
+      else if (!form.elements.know.value) msg = "Choose one to continue!";
     }
     if (n === 2 && !attending()) msg = "Choose one to continue!";
     if (err) err.textContent = msg;
@@ -1159,7 +1179,15 @@
     const first = $("input:not([type=radio]), textarea", steps[n - 1]);
     if (first && n !== 3) first.focus({ preventScroll: true });
   }
-  nextBtn.addEventListener("click", () => { if (validate(step)) { sfx.select(); go(step + 1); } });
+  nextBtn.addEventListener("click", () => {
+    if (step === 1 && form.elements.know.value === "Neither") {
+      $('[data-err="1"]', form).textContent = "";
+      sfx.error();
+      openKnowPop();
+      return;
+    }
+    if (validate(step)) { sfx.select(); go(step + 1); }
+  });
   prevBtn.addEventListener("click", () => { sfx.blip(); go(step - 1); });
   form.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && e.target.tagName === "INPUT" && step < 4) { e.preventDefault(); nextBtn.click(); }
@@ -1169,15 +1197,22 @@
     e.preventDefault();
     if (!validate(4)) return;
     const yes = attending() === "yes";
-    const party = yes ? $$(".guest-row").map((r) => ({ name: $("input", r).value.trim(), meal: $("select", r).value })) : [];
+    const party = yes ? $$(".guest-row").map((r) => ({
+      name: $("[data-guest-name]", r).value.trim(),
+      dietary: $("[data-guest-dietary]", r).value.trim(),
+    })) : [];
     const data = {
       timestamp: new Date().toISOString(),
       name: form.elements.name.value.trim(),
       email: form.elements.email.value.trim(),
+      know: form.elements.know.value,
       attending: attending(),
       guests: yes ? +guestsInput.value : 0,
-      party: party.map((p, i) => `${p.name || "Guest " + (i + 1)} (${p.meal})`).join("; "),
-      dietary: yes ? form.elements.dietary.value.trim() : "",
+      party: party.map((p, i) => p.name || "Guest " + (i + 1)).join("; "),
+      dietary: party
+        .map((p, i) => (p.dietary ? `${p.name || "Guest " + (i + 1)}: ${p.dietary}` : ""))
+        .filter(Boolean)
+        .join("; "),
       song: yes ? form.elements.song.value.trim() : "",
       message: form.elements.message.value.trim(),
     };

@@ -21,7 +21,7 @@
  *   Comments — comments under gallery photos ("photo" = the photo's file inside assets/gallery/)
  * To remove a message or comment from the website, type anything (e.g. x) in its "hide" column.
  */
-const HEADERS = ["timestamp", "name", "email", "attending", "guests", "party", "dietary", "song", "message"];
+const HEADERS = ["timestamp", "name", "email", "attending", "guests", "party", "dietary", "song", "message", "know"];
 const NOTE_HEADERS = ["time", "id", "photo", "name", "text", "hide"];
 
 function json(o) {

@@ -49,6 +49,18 @@
     </div>
   </div>
 
+  <!-- RSVP: shown if visitor says they know neither Chin-Yi nor Sixuan -->
+  <div class="pop" id="knowPop" role="dialog" aria-modal="true" aria-labelledby="knowPopTitle" hidden>
+    <div class="pop-box parchment">
+      <div class="pop-icon" aria-hidden="true">🤔</div>
+      <h3 id="knowPopTitle">Wait a second!</h3>
+      <p>Maybe not RSVP if you don't know the couple, thanks!</p>
+      <div class="pop-actions">
+        <button type="button" class="btn btn-pink" id="knowPopClose">OK</button>
+      </div>
+    </div>
+  </div>
+
   <div class="hud">
     <button id="fullBtn" class="hud-btn full-btn" type="button" aria-label="Full screen" title="Full screen" hidden>
       <svg class="fs-in" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 1h5v2H3v3H1zM10 1h5v5h-2V3h-3zM1 10h2v3h3v2H1zM13 10h2v5h-5v-2h3z"/></svg>
@@ -222,8 +234,8 @@
           <h4>💬 Comments</h4>
           <ol class="lb-list" id="lbList"></ol>
           <form class="lb-form" id="lbForm" autocomplete="off" novalidate>
-            <input name="name" maxlength="40" placeholder="e.g. Leia Dang" aria-label="Your name" />
-            <textarea name="text" rows="2" maxlength="300" placeholder="Say something about this photo..." aria-label="Your comment"></textarea>
+            <label>Your name<input name="name" maxlength="40" placeholder="e.g. Leia Dang" aria-label="Your name" /></label>
+            <label>Your comment<textarea name="text" rows="2" maxlength="300" placeholder="Say something about this photo..." aria-label="Your comment"></textarea></label>
             <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
             <div class="note-form-row">
               <span class="err" data-note-err></span>
@@ -248,7 +260,7 @@
             <li><span class="ico">📅</span><div><b>Saturday, May 15, 2027</b><small>Save the date!</small></div></li>
             <li><span class="ico">⛪</span><div><b>Duke Chapel</b><small>401 Chapel Dr, Durham, NC 27708</small></div></li>
             <li><span class="ico">📍</span><div><b>Durham, North Carolina</b><small><a href="https://maps.google.com/?q=Duke+Chapel+Durham+NC" target="_blank" rel="noopener">Open in Maps ↗</a></small></div></li>
-            <li><span class="ico">👗</span><div><b>Dress code: Formal / Cocktail</b><small>Comfortable shoes — the quad is grassy!</small></div></li>
+            <!-- <li><span class="ico">👗</span><div><b>Dress code: Formal / Cocktail</b><small>Comfortable shoes — the quad is grassy!</small></div></li> -->
           </ul>
           <a href="#rsvp" data-go="rsvp" class="btn btn-pink wide">✉ Accept this quest (RSVP)</a>
         </div>
@@ -256,14 +268,14 @@
         <div class="panel parchment">
           <h3>Objectives</h3>
           <ol class="objectives">
-            <li><span class="time">3:30 PM</span><span class="obj">Arrive &amp; find your seat at Duke Chapel</span></li>
-            <li><span class="time">4:00 PM</span><span class="obj">Ceremony — witness the vows 💍</span></li>
-            <li><span class="time">5:00 PM</span><span class="obj">Photos on the quad &amp; cocktail hour 🥂</span></li>
-            <li><span class="time">6:30 PM</span><span class="obj">Reception dinner 🍽</span></li>
-            <li><span class="time">8:00 PM</span><span class="obj">First dance &amp; party on the dance floor 💃</span></li>
-            <li><span class="time">10:30 PM</span><span class="obj">Sparkler send-off ✨ <em>Quest complete!</em></span></li>
+            <li><span class="time">5:30 PM</span><span class="obj">Arrive at Duke Chapel!</span></li>
+            <li><span class="time">6:00 PM</span><span class="obj">Ceremony: witness the vows 💍</span></li>
+            <li><span class="time">7:00 PM</span><span class="obj">Photos &amp; cocktail hour 🥂</span></li>
+            <li><span class="time">8:00 PM</span><span class="obj">Reception dinner 🍽</span></li>
+            <li><span class="time">9:00 PM</span><span class="obj">First dance &amp; party 💃</span></li>
+            <li><span class="time">10:00 PM</span><span class="obj">After party 🍻 <em>Quest complete!</em></span></li>
           </ol>
-          <p class="note" data-i18n-html>* Times are placeholders — update in <code>index.html</code>.</p>
+          <!-- <p class="note" data-i18n-html>* Times are placeholders — update in <code>index.html</code>.</p> -->
         </div>
       </div>
 
@@ -303,7 +315,7 @@
         <article class="slot panel">
           <div class="slot-icon">✈</div>
           <h4>Flying in</h4>
-          <p data-i18n-html>Fly into <b>Raleigh-Durham International (RDU)</b> — about 25 minutes from Duke by car.</p>
+          <p data-i18n-html>Fly into Raleigh-Durham International (RDU), about 25 minutes drive to Duke.</p>
         </article>
         <article class="slot panel">
           <div class="slot-icon">🏨</div>
@@ -346,9 +358,16 @@
 
         <!-- Step 1 -->
         <fieldset class="step" data-step="1">
-          <legend>Player 1 — who are you?</legend>
+          <legend>Who are you?</legend>
           <label>Full name<input name="name" required autocomplete="off" placeholder="e.g. Leia Dang" /></label>
           <label>Email<input name="email" type="email" required autocomplete="off" placeholder="you@example.com" /></label>
+          <div class="field-lbl">Who do you know?</div>
+          <div class="choices choices-sm" role="radiogroup" aria-label="Who do you know?">
+            <label class="choice"><input type="radio" name="know" value="Chin-Yi" /><span><b>Chin-Yi</b></span></label>
+            <label class="choice"><input type="radio" name="know" value="Sixuan" /><span><b>Sixuan</b></span></label>
+            <label class="choice"><input type="radio" name="know" value="Both" /><span><b>Both</b></span></label>
+            <label class="choice"><input type="radio" name="know" value="Neither" /><span><b>Neither</b></span></label>
+          </div>
           <div class="err" data-err="1"></div>
         </fieldset>
 
@@ -380,7 +399,6 @@
               </div>
             </label>
             <div id="guestList" class="guest-list"></div>
-            <label>Dietary restrictions / allergies<input name="dietary" placeholder="Vegetarian, nut allergy, ..." /></label>
           </div>
           <div class="if-no">
             <p class="center">We'll miss you! 🥺 Feel free to leave us a note on the next screen.</p>

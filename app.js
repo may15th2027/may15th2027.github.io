@@ -995,14 +995,14 @@
 
   /* ================= TRAVEL MAP ================= */
   const pinInfo = {
-    airport: "✈ <b>RDU Airport</b> — Raleigh-Durham International. ~25 min drive to Duke.",
+    airport: "✈ <b>RDU Airport</b> — Raleigh-Durham International. ~25 min drive to Duke. Chin-Yi's least favorite spot on the map, too many goodbyes with Sixuan here.",
     chapel: "⛪ <b>Duke Chapel</b> — 401 Chapel Dr, Durham. Ceremony location! <a href='https://maps.google.com/?q=Duke+Chapel' target='_blank' rel='noopener'>Directions ↗</a>",
     hotel: "🏢 <b>Durham Downtown</b> — A lively hub for dining, shopping, arts, and local culture.",
-    food: "🍽️ <b>Parizade</b> — One of the oldest restaurants in Durham. It features a Mediterranean style menu and will host the cocktail hour, reception dinner and dance party.",
+    food: "🍽️ <b>Parizade</b> — One of the oldest restaurants in Durham. It features a Mediterranean style menu and will host the cocktail hour, reception dinner and dance party. <a href='https://maps.app.goo.gl/B8QxCbtWU9Mq2k4z5' target='_blank' rel='noopener'>Directions ↗</a>",
     home: "🏡 <b>Home</b> — Where Chin-Yi, Sixuan and Leia live. Our little base camp in Durham! Sorry, Jeffrey.",
-    chapelhill: "🎓 <b>Chapel Hill</b> — Home of UNC. A cute college town with cafés and shops on Franklin Street, about 20 min from Duke.",
-    airbnb: "🏠 <b>Party House</b> — A big house with a basketball court, fire pit, and 6 bedrooms. The after party will be here! About 30 min from Duke.",
-    cary: "🏘️ <b>Cary</b> — A quiet, friendly town with lovely parks and shops close to RDU and I-40. Fun fact: Cary is a sister city of Hsinchu!",
+    chapelhill: "🎓 <b>Chapel Hill</b> — A cute college town with cafés and shops on Franklin Street. Home of Duke's rival UNC, though that hasn't stopped Chin-Yi, Sixuan, and Jeffrey from going to the bars on Franklin Street. About 20 min from Duke.",
+    airbnb: "🏠 <b>Party House</b> — A big house with a basketball court, fire pit, and 6 bedrooms. The after party will be here! About 30 min from Duke. The house is not open to the public, so please RSVP to get the address.",
+    cary: "🏘️ <b>Cary</b> — A quiet, friendly town with lovely parks and shops close to RDU and I-40. Fun fact: Cary is a sister city of Hsinchu, Taiwan!",
     raleigh: "🏛️ <b>Raleigh</b> — North Carolina's capital: free museums, food halls and the State Capitol. About 35 min from Duke.",
   };
   // Clicking a place opens a pop-up with its photo and description.

@@ -9,7 +9,6 @@ window.WEDDING_CONFIG = {
   rsvpEndpoint: "https://script.google.com/macros/s/AKfycbwfMhNgl21xZMbNrTamUTV7hF6SeNRYd0TXeth_3BAhaSgHN8SimfVtKl6GxJ3k2hz4iQ/exec",
 
   maxGuests: 6,
-  mealOptions: ["Chicken", "Fish", "Vegetarian", "Kids meal"],
 
   // ---- Character cards (top of "Our Story") ----
   // stats = the six RPG stats on the hexagon chart, each 1–10:

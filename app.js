@@ -1112,19 +1112,21 @@
   function renderGuests() {
     const n = +guestsInput.value;
     const box = $("#guestList");
-    const prev = $$(".guest-row", box).map((r) => ({ n: $("input", r).value, m: $("select", r).value }));
+    const prev = $$(".guest-row", box).map((r) => ({
+      name: $("[data-guest-name]", r).value,
+      dietary: $("[data-guest-dietary]", r).value,
+    }));
     box.innerHTML = "";
     for (let i = 0; i < n; i++) {
       const row = document.createElement("div");
       row.className = "guest-row";
-      const opts = CFG.mealOptions.map((m) => `<option value="${esc(m)}">${esc(m)}</option>`).join(""); // value stays English for the sheet
       row.innerHTML = `
         <label>${i === 0 ? "Player 1 (you)" : "Player " + (i + 1)} name
           <input data-guest-name placeholder="Full name" /></label>
-        <label>Meal<select data-guest-meal>${opts}</select></label>`;
-      const nameIn = $("input", row);
-      nameIn.value = prev[i]?.n ?? (i === 0 ? form.elements.name.value : "");
-      if (prev[i]) $("select", row).value = prev[i].m;
+        <label>Dietary restrictions / allergies
+          <input data-guest-dietary placeholder="Vegetarian, nut allergy, ..." /></label>`;
+      $("[data-guest-name]", row).value = prev[i]?.name ?? (i === 0 ? form.elements.name.value : "");
+      $("[data-guest-dietary]", row).value = prev[i]?.dietary ?? "";
       box.appendChild(row);
     }
   }
@@ -1169,15 +1171,21 @@
     e.preventDefault();
     if (!validate(4)) return;
     const yes = attending() === "yes";
-    const party = yes ? $$(".guest-row").map((r) => ({ name: $("input", r).value.trim(), meal: $("select", r).value })) : [];
+    const party = yes ? $$(".guest-row").map((r) => ({
+      name: $("[data-guest-name]", r).value.trim(),
+      dietary: $("[data-guest-dietary]", r).value.trim(),
+    })) : [];
     const data = {
       timestamp: new Date().toISOString(),
       name: form.elements.name.value.trim(),
       email: form.elements.email.value.trim(),
       attending: attending(),
       guests: yes ? +guestsInput.value : 0,
-      party: party.map((p, i) => `${p.name || "Guest " + (i + 1)} (${p.meal})`).join("; "),
-      dietary: yes ? form.elements.dietary.value.trim() : "",
+      party: party.map((p, i) => p.name || "Guest " + (i + 1)).join("; "),
+      dietary: party
+        .map((p, i) => (p.dietary ? `${p.name || "Guest " + (i + 1)}: ${p.dietary}` : ""))
+        .filter(Boolean)
+        .join("; "),
       song: yes ? form.elements.song.value.trim() : "",
       message: form.elements.message.value.trim(),
     };

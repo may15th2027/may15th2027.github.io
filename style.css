@@ -488,10 +488,10 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
 .stepper { display: flex; gap: 0; margin-top: 6px; width: max-content; }
 .stepper button { width: 48px; font: 700 26px var(--font); background: var(--wood); color: var(--parch); border: 0; cursor: var(--cur-click); box-shadow: 0 0 0 3px var(--wood-dark); }
 .stepper input { width: 70px !important; text-align: center; margin: 0 !important; }
-.guest-list { display: grid; gap: 12px; margin-bottom: 16px; }
-.guest-row { display: grid; grid-template-columns: 1fr 170px; gap: 12px; align-items: end; }
+.guest-list { display: grid; gap: 14px; margin-bottom: 16px; }
+.guest-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+.guest-row:not(:last-child) { padding-bottom: 14px; border-bottom: 2px dashed rgba(90, 52, 24, .2); }
 .guest-row label { margin: 0 !important; }
-.guest-row select { display: block; width: 100%; margin-top: 6px; padding: 12px 8px; font: 18px var(--font); background: #fffaf0; border: 0; box-shadow: 0 0 0 3px var(--wood-dark); color: var(--ink); }
 .rsvp.no .if-yes, .rsvp:not(.no) .if-no { display: none; }
 .form-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; }
 .center-row { justify-content: center; flex-wrap: wrap; }

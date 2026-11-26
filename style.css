@@ -469,7 +469,11 @@ h3 { font-size: 28px; margin: 0 0 14px; }
 .xp-bar i { display: block; height: 100%; width: 25%; background: repeating-linear-gradient(90deg, var(--pink) 0 12px, var(--pink-hi) 12px 16px); transition: width .3s steps(5); }
 fieldset { border: 0; padding: 0; margin: 0; }
 legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
-.rsvp label { display: block; font-size: 18px; margin-bottom: 16px; }
+.rsvp label, .field-lbl { display: block; font-size: 18px; margin-bottom: 16px; }
+.field-lbl { margin-bottom: 8px; }
+.choices-sm { margin-bottom: 16px; }
+.choices-sm .choice span { padding: 13px 12px; }
+.choices-sm .choice b { font-size: 19px; }
 .rsvp input:not([type=radio]), .rsvp textarea {
   display: block; width: 100%; margin-top: 6px; padding: 12px; font: 20px var(--font); color: var(--ink);
   background: #fffaf0; border: 0; box-shadow: 0 0 0 3px var(--wood-dark), inset 0 3px 0 #e8d3a6;
@@ -538,6 +542,7 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
   background: rgba(30, 15, 40, .65); animation: screenIn .25s steps(4); }
 .pop-box { width: min(440px, 100%); text-align: center; padding: 28px 26px 24px; }
 .pop-heart { font-size: 56px; animation: beat 1s steps(2) infinite; }
+.pop-icon { font-size: 56px; line-height: 1.1; }
 .pop-box h3 { margin: 6px 0 8px; }
 .pop-box p { margin: 0 0 18px; font-size: 19px; }
 .pop-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }

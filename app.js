@@ -1106,7 +1106,23 @@
   const steps = $$(".step", form);
   const prevBtn = $("#prevBtn"), nextBtn = $("#nextBtn"), submitBtn = $("#submitBtn");
   const guestsInput = form.elements.guests;
+  const knowPop = $("#knowPop"), knowPopClose = $("#knowPopClose");
   let step = 1;
+
+  function openKnowPop() {
+    knowPop.hidden = false;
+    knowPopClose.focus();
+  }
+  function closeKnowPop() {
+    knowPop.hidden = true;
+    $('input[name="know"]:checked', form)?.focus({ preventScroll: true });
+  }
+  knowPop.addEventListener("click", (e) => {
+    if (e.target === knowPop || e.target === knowPopClose) { sfx.blip(); closeKnowPop(); }
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !knowPop.hidden) { e.stopPropagation(); sfx.blip(); closeKnowPop(); }
+  });
 
   function attending() { return form.elements.attending.value; }
   function renderGuests() {
@@ -1136,6 +1152,7 @@
   }));
   form.addEventListener("change", (e) => {
     if (e.target.name === "attending") { form.classList.toggle("no", attending() === "no"); sfx.select(); }
+    if (e.target.name === "know") sfx.select();
   });
 
   function validate(n) {
@@ -1144,6 +1161,7 @@
     if (n === 1) {
       if (!form.elements.name.value.trim()) msg = "Please enter your name.";
       else if (!/^\S+@\S+\.\S+$/.test(form.elements.email.value.trim())) msg = "Please enter a valid email.";
+      else if (!form.elements.know.value) msg = "Choose one to continue!";
     }
     if (n === 2 && !attending()) msg = "Choose one to continue!";
     if (err) err.textContent = msg;
@@ -1161,7 +1179,15 @@
     const first = $("input:not([type=radio]), textarea", steps[n - 1]);
     if (first && n !== 3) first.focus({ preventScroll: true });
   }
-  nextBtn.addEventListener("click", () => { if (validate(step)) { sfx.select(); go(step + 1); } });
+  nextBtn.addEventListener("click", () => {
+    if (step === 1 && form.elements.know.value === "Neither") {
+      $('[data-err="1"]', form).textContent = "";
+      sfx.error();
+      openKnowPop();
+      return;
+    }
+    if (validate(step)) { sfx.select(); go(step + 1); }
+  });
   prevBtn.addEventListener("click", () => { sfx.blip(); go(step - 1); });
   form.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && e.target.tagName === "INPUT" && step < 4) { e.preventDefault(); nextBtn.click(); }
@@ -1179,6 +1205,7 @@
       timestamp: new Date().toISOString(),
       name: form.elements.name.value.trim(),
       email: form.elements.email.value.trim(),
+      know: form.elements.know.value,
       attending: attending(),
       guests: yes ? +guestsInput.value : 0,
       party: party.map((p, i) => p.name || "Guest " + (i + 1)).join("; "),

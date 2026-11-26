@@ -406,14 +406,14 @@
         b.disabled = i >= u;
         b.className = (i === ch ? "current" : "") + (i === justUnlocked ? " just-unlocked" : "");
         b.innerHTML = i < u ? `${esc(c.emoji)} Chapter ${i + 1}<small>${esc(c.subtitle)}</small>` : `🔒 Chapter ${i + 1}<small>Locked</small>`;
-        b.addEventListener("click", () => { sfx.blip(); load(i); });
+        b.addEventListener("click", () => { sfx.blip(); load(i); toDialog(); });
         li.appendChild(b); list.appendChild(li);
       });
       if (u > 1) {
         const li = document.createElement("li");
         const r = document.createElement("button");
         r.type = "button"; r.className = "restart"; r.textContent = "↺ Restart this story";
-        r.addEventListener("click", () => { sfx.blip(); store.set(key(), 1); justUnlocked = -1; load(0); });
+        r.addEventListener("click", () => { sfx.blip(); store.set(key(), 1); justUnlocked = -1; load(0); toDialog(); });
         li.appendChild(r); list.appendChild(li);
       }
     }
@@ -430,7 +430,11 @@
       justUnlocked = -1;
       load(Math.min(ch, unlocked() - 1)); // same moment if this version has unlocked it
       if (scroll) $("#storyTitle").scrollIntoView({ behavior: "smooth", block: "start" });
+      toDialog();
     }
+    // After clicking a character card / chapter / Back, put the keyboard focus on the dialogue box,
+    // so Space goes to the next line instead of pressing that button again (which restarted the story).
+    function toDialog() { dlg.focus({ preventScroll: true }); }
     function load(i, at = 0, instant = false) {
       ch = i; line = at;
       const c = part(i);
@@ -674,7 +678,7 @@
     });
     window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) { e.stopImmediatePropagation(); closePop(); } }, true);
 
-    backBtn.addEventListener("click", (e) => { e.stopPropagation(); sfx.blip(); back(); });
+    backBtn.addEventListener("click", (e) => { e.stopPropagation(); sfx.blip(); back(); if (e.detail) toDialog(); }); // mouse/tap click; keyboard users keep focus on Back
     dlg.addEventListener("click", () => {
       if (full === "__end") { sfx.select(); openPop(); return; }
       if (full.startsWith("__goto:")) { sfx.select(); const i = +full.slice(7); justUnlocked = -1; load(i); return; }
@@ -755,7 +759,6 @@
     function wire(form, kind, extra, max) {
       const err = $("[data-note-err]", form), count = $(".note-count", form), btn = $("button[type=submit]", form);
       const nameIn = form.elements.name, textIn = form.elements.text;
-      nameIn.value = store.get("guest-name", "");
       if (count) textIn.addEventListener("input", () => (count.textContent = `${textIn.value.length}/${max}`));
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -768,7 +771,7 @@
         try {
           await post(kind, { name, text, website: form.elements.website.value, ...extra() });
           await wait(Math.max(0, 700 - (Date.now() - shown))); // stay up long enough to read
-          last = Date.now(); store.set("guest-name", name);
+          last = Date.now();
           textIn.value = ""; if (count) count.textContent = `0/${max}`;
           sfx.select();
           sending.show("Sent! ✨", "💌"); await wait(1000);
@@ -1180,7 +1183,6 @@
         const all = store.get("rsvps-local", []); all.push(data); store.set("rsvps-local", all);
         console.info("[RSVP] No rsvpEndpoint set in config.js — saved locally only:", data);
       }
-      store.set("my-rsvp", data);
       celebrate(yes, data.name);
     } catch (err) {
       $('[data-err="4"]').textContent = "Hmm, the carrier pigeon got lost. Please try again!";
@@ -1216,9 +1218,9 @@
     $("#rsvpDone").hidden = true; form.hidden = false; go(1); sfx.blip();
   });
 
-  // Pre-fill from a previous RSVP on this device
-  const mine = store.get("my-rsvp", null);
-  if (mine) { form.elements.name.value = mine.name; form.elements.email.value = mine.email; }
+  // Forms never remember what was typed before: every visit starts empty, showing the grey example text.
+  // (Older versions saved the name / last RSVP on the device: remove those copies.)
+  try { localStorage.removeItem("guest-name"); localStorage.removeItem("my-rsvp"); } catch (e) {}
   go(1);
 
   /* ================= INIT ================= */

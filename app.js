@@ -441,36 +441,68 @@
     const slug = (n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, "");
     let sceneToken = 0;
     const imgOk = {}; // remembers which picture files exist
+    // the pictures to try for one sentence, best first
+    function sceneTries(c, l) {
+      const [speaker, , pic] = part(c).lines[l];
+      const base = `assets/story/${slug(viewer)}-ch${c + 1}-${l + 1}`;
+      const chapterBase = `assets/story/${slug(viewer)}-ch${c + 1}`; // one picture for the whole chapter
+      const portrait = (charOf(speaker) || {}).photo;
+      return [pic && { src: pic, kind: "full" },
+              { src: base + ".png", kind: "full" }, { src: base + ".jpg", kind: "full" },
+              { src: chapterBase + ".png", kind: "full" }, { src: chapterBase + ".jpg", kind: "full" },
+              portrait && { src: portrait, kind: "portrait" }].filter(Boolean)
+             .filter((t) => imgOk[t.src] !== false);
+    }
+    // Shows this sentence's picture. Resolves once the new picture is on screen (and its
+    // pop-in animation has played), so the sentence can start typing after the picture changed.
     function setScene() {
       const token = ++sceneToken;
-      const [speaker, , pic] = part(ch).lines[line];
-      const sceneKey = `${slug(viewer)}-ch${ch + 1}-${line + 1}`;
-      const base = `assets/story/${sceneKey}`;
-      const chapterBase = `assets/story/${slug(viewer)}-ch${ch + 1}`; // one picture for the whole chapter
-      const portrait = (charOf(speaker) || {}).photo;
-      const tries = [pic && { src: pic, kind: "full" },
-                     { src: base + ".png", kind: "full" }, { src: base + ".jpg", kind: "full" },
-                     { src: chapterBase + ".png", kind: "full" }, { src: chapterBase + ".jpg", kind: "full" },
-                     portrait && { src: portrait, kind: "portrait" }].filter(Boolean)
-                    .filter((t) => imgOk[t.src] !== false);
-      const showEmoji = () => { photo.hidden = true; emojiEl.hidden = false; sceneBox.classList.remove("has-full"); };
-      const attempt = (i) => {
-        if (token !== sceneToken) return;
-        if (i >= tries.length) return showEmoji();
-        const t = tries[i], img = new Image();
-        img.onload = () => {
-          imgOk[t.src] = true;
-          if (token !== sceneToken) return;
-          photo.src = t.src; photo.className = "scene-photo " + t.kind;
-          photo.alt = t.kind === "portrait" ? tr(speaker) : `${tr(speaker)}: ${tr(part(ch).lines[line][1])}`;
-          photo.hidden = false; emojiEl.hidden = true;
-          sceneBox.classList.toggle("has-full", t.kind === "full");
-          photo.style.animation = "none"; void photo.offsetWidth; photo.style.animation = "";
+      const [speaker] = part(ch).lines[line];
+      const tries = sceneTries(ch, line);
+      return new Promise((done) => {
+        const showEmoji = () => { photo.hidden = true; emojiEl.hidden = false; sceneBox.classList.remove("has-full"); done(); };
+        const attempt = (i) => {
+          if (token !== sceneToken) return done();
+          if (i >= tries.length) return showEmoji();
+          const t = tries[i], img = new Image();
+          img.onload = () => {
+            imgOk[t.src] = true;
+            if (token !== sceneToken) return done();
+            const same = !photo.hidden && photo.getAttribute("src") === t.src;
+            photo.src = t.src; photo.className = "scene-photo " + t.kind;
+            photo.alt = t.kind === "portrait" ? tr(speaker) : `${tr(speaker)}: ${tr(part(ch).lines[line][1])}`;
+            photo.hidden = false; emojiEl.hidden = true;
+            sceneBox.classList.toggle("has-full", t.kind === "full");
+            if (same) return done(); // same picture as before: nothing to wait for
+            photo.style.animation = "none"; void photo.offsetWidth; photo.style.animation = "";
+            setTimeout(done, 350); // .scene-photo pop-in animation
+          };
+          img.onerror = () => { imgOk[t.src] = false; attempt(i + 1); };
+          img.src = t.src;
         };
-        img.onerror = () => { imgOk[t.src] = false; attempt(i + 1); };
-        img.src = t.src;
+        attempt(0);
+      });
+    }
+    // Look up the next sentence's picture ahead of time, so it appears without a wait.
+    function preloadNext() {
+      let c = ch, l = line + 1;
+      if (l >= part(c).lines.length) { c++; l = 0; }
+      if (c >= chapters.length) return;
+      const tries = sceneTries(c, l);
+      const attempt = (i) => {
+        if (i >= tries.length || imgOk[tries[i].src] === true) return;
+        const img = new Image();
+        img.onload = () => { imgOk[tries[i].src] = true; };
+        img.onerror = () => { imgOk[tries[i].src] = false; attempt(i + 1); };
+        img.src = tries[i].src;
       };
       attempt(0);
+    }
+    // resolves when the face in the dialogue box has loaded (or failed)
+    function portraitReady() {
+      const im = $("#dlgPortrait img");
+      if (!im || im.complete) return Promise.resolve();
+      return new Promise((done) => { im.addEventListener("load", done, { once: true }); im.addEventListener("error", done, { once: true }); });
     }
     // speaker name -> character: exact name, or a name inside it ("Stormy (Leia)" -> Leia).
     // Two or more names ("Chin-Yi & Sixuan") count as the couple, not one character.
@@ -511,27 +543,41 @@
         const use = () => { const im = box.querySelector("img"); if (im && token === sceneToken) { im.src = face; box.classList.add("cutout"); } };
         if (imgOk[face] === true) use();
         else if (imgOk[face] !== false) {
-          const probe = new Image();
-          probe.onload = () => { imgOk[face] = true; use(); };
-          probe.onerror = () => { imgOk[face] = false; };
-          probe.src = face;
+          return new Promise((done) => {
+            const probe = new Image();
+            probe.onload = () => { imgOk[face] = true; use(); done(); };
+            probe.onerror = () => { imgOk[face] = false; done(); };
+            probe.src = face;
+          });
         }
       }
+      return Promise.resolve();
     }
     function say(instant = false) {
-      setScene();
+      const sceneShown = setScene();
       const [name, txt, , place] = part(ch).lines[line];
       $("#scenePlace").textContent = t(place || part(ch).place, "place") || "—"; // each sentence has its own place
-      setPortrait(name);
+      const faceShown = setPortrait(name);
       backBtn.hidden = ch === 0 && line === 0; // nothing before the very first line
       who.textContent = t(name); full = t(txt); textEl.textContent = "";
-      let k = 0; clearInterval(typing); typing = null;
+      clearInterval(typing); typing = null;
+      preloadNext();
       if (instant) { textEl.textContent = full; return; } // going back: show the whole line at once
-      typing = setInterval(() => {
-        textEl.textContent = full.slice(0, ++k);
-        if (k % 2) sfx.type();
-        if (k >= full.length) { clearInterval(typing); typing = null; }
-      }, 28);
+      // The sentence starts typing only once the new picture and face are on screen
+      // (at most 2.5 s, so a slow connection never blocks the story). A click while
+      // waiting shows the whole sentence at once, like a click while typing.
+      const wait = {};
+      typing = wait;
+      Promise.race([Promise.all([sceneShown, faceShown, portraitReady()]), new Promise((r) => setTimeout(r, 2500))])
+        .then(() => {
+          if (typing !== wait) return; // clicked, or moved on, while waiting
+          let k = 0;
+          typing = setInterval(() => {
+            textEl.textContent = full.slice(0, ++k);
+            if (k % 2) sfx.type();
+            if (k >= full.length) { clearInterval(typing); typing = null; }
+          }, 28);
+        });
     }
     function advance() {
       if (typing) { clearInterval(typing); typing = null; textEl.textContent = full; return; }

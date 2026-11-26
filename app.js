@@ -1008,12 +1008,48 @@
       frame.style.backgroundSize = `${(100 / s) * 100}%`;
       frame.style.backgroundPosition = `${s < 100 ? (x / (100 - s)) * 100 : 0}% ${s < 100 ? (y / (100 - s)) * 100 : 0}%`;
     }
-    function tryPhoto() {
-      if (tries >= EXT.length) { img.hidden = true; mapCrop(spot); return; }
-      img.src = `assets/places/${spot.dataset.pin}.${EXT[tries++]}`;
+    // Several photos for one place: chapel.jpg, chapel-2.jpg, chapel-3.jpg … (numbers in a row;
+    // each can be .jpg, .png or .webp). The pop-up then gets ◀ ▶ arrows (or swipe / arrow keys).
+    const MAX = 20, found = {}; // found[pin] = list of photo files that exist
+    let photos = [], cur = 0, token = 0;
+    const prevB = $(".ph-prev", pop), nextB = $(".ph-next", pop), dots = $(".ph-dots", pop);
+    const exists = (src) => new Promise((r) => { const p = new Image(); p.onload = () => r(true); p.onerror = () => r(false); p.src = src; });
+    async function findPhotos(pin, onFound) {
+      if (found[pin]) { found[pin].forEach(onFound); return; }
+      const list = [];
+      for (let n = 1; n <= MAX; n++) {
+        let hit = null;
+        for (const e of EXT) {
+          const src = `assets/places/${pin}${n === 1 ? "" : "-" + n}.${e}`;
+          if (await exists(src)) { hit = src; break; }
+        }
+        if (!hit) break;
+        list.push(hit); onFound(hit);
+      }
+      found[pin] = list;
     }
-    img.addEventListener("load", () => { img.hidden = false; frame.style.backgroundImage = ""; });
-    img.addEventListener("error", tryPhoto);
+    function show(i) {
+      if (!photos.length) { img.hidden = true; mapCrop(spot); return; }
+      cur = (i + photos.length) % photos.length;
+      img.src = photos[cur]; img.hidden = false; frame.style.backgroundImage = "";
+      const many = photos.length > 1;
+      prevB.hidden = nextB.hidden = !many;
+      dots.innerHTML = many ? photos.map((_, k) => `<i${k === cur ? ' class="on"' : ""}></i>`).join("") : "";
+    }
+    function tryPhoto() {
+      const my = ++token; photos = [];
+      findPhotos(spot.dataset.pin, (src) => {
+        if (my !== token) return;
+        photos.push(src);
+        if (photos.length === 1) show(0); else show(cur); // first photo shows at once; later ones add a dot
+      });
+    }
+    const step = (d) => { if (photos.length > 1) { sfx.blip(); show(cur + d); } };
+    prevB.addEventListener("click", () => step(-1));
+    nextB.addEventListener("click", () => step(1));
+    let sx = null; // swipe left / right on phones
+    frame.addEventListener("pointerdown", (e) => { sx = e.clientX; });
+    frame.addEventListener("pointerup", (e) => { if (sx !== null && Math.abs(e.clientX - sx) > 40) step(e.clientX < sx ? 1 : -1); sx = null; });
     function fill() {
       // "✈ <b>RDU Airport</b> — text": the bold part becomes the title, the rest the description
       const html = t(pinInfo[spot.dataset.pin]);
@@ -1023,8 +1059,9 @@
       img.alt = title.textContent;
     }
     function open(b) {
-      spot = b; tries = 0;
+      spot = b; cur = 0;
       $$(".map-area [data-pin]").forEach((x) => x.classList.toggle("on", x === b));
+      prevB.hidden = nextB.hidden = true; dots.innerHTML = "";
       fill(); img.hidden = true; mapCrop(b); tryPhoto();
       pop.hidden = false; $(".news-close", pop).focus();
     }
@@ -1035,7 +1072,12 @@
     }
     $$(".map-area [data-pin]").forEach((b) => b.addEventListener("click", () => { sfx.select(); open(b); }));
     pop.addEventListener("click", (e) => { if (e.target === pop || e.target.closest(".news-close")) { sfx.blip(); close(); } });
-    window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) close(); });
+    window.addEventListener("keydown", (e) => {
+      if (pop.hidden) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") step(-1);
+      else if (e.key === "ArrowRight") step(1);
+    });
     document.addEventListener("langchange", () => { setMap(); if (!pop.hidden) { fill(); if (img.hidden) mapCrop(spot); } });
   })();
 

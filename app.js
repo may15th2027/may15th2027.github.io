@@ -16,6 +16,7 @@
     if (!soundOn) return;
     try {
       actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state !== "running") actx.resume(); // Safari can leave it suspended (or "interrupted") until a tap
       const t = actx.currentTime + when;
       const o = actx.createOscillator(), g = actx.createGain();
       o.type = type; o.frequency.setValueAtTime(freq, t);
@@ -37,7 +38,7 @@
   // background music: day = warm melodic (music-day.js), night = hard rock (music-night.js).
   // Needs a click/key first, because browsers block sound until then.
   function audio() {
-    try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch {}
+    try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state !== "running") actx.resume(); } catch {}
     return actx;
   }
   let nightMode = false;
@@ -50,9 +51,17 @@
     if (on) want.play(audio()); else want.stop(); // ...while the other one fades in
   }
   function setNight(v) { if (nightMode === v) return; nightMode = v; if (window.BGM_DAY && (BGM_DAY.playing || BGM_NIGHT.playing)) music(); }
-  const firstGesture = () => { music(); window.removeEventListener("pointerdown", firstGesture); window.removeEventListener("keydown", firstGesture); };
-  window.addEventListener("pointerdown", firstGesture);
-  window.addEventListener("keydown", firstGesture);
+  // Safari only lets sound start inside a finished tap/click (touchend / click), not on pointerdown
+  // like Chrome does, so listen to all of them and keep trying until the audio is really running.
+  const GESTURES = ["pointerdown", "touchend", "click", "keydown"];
+  const firstGesture = () => {
+    music();
+    if (!soundOn) return; // music is off: wait until it's switched on (the ♪ button is a click, so it unlocks then)
+    if (actx && actx.state === "running") GESTURES.forEach((g) => window.removeEventListener(g, firstGesture, true));
+  };
+  GESTURES.forEach((g) => window.addEventListener(g, firstGesture, true));
+  // iPhone: by default web audio is muted when the side switch is on silent; "playback" plays it like a video would
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {}
   document.addEventListener("visibilitychange", () => { if (window.BGM_DAY && (BGM_DAY.playing || BGM_NIGHT.playing || !document.hidden)) music(); });
   /* ================= CHAT (a joke: whatever you ask, it answers with a hint about the secret night view) ================= */
   (() => {

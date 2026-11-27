@@ -292,6 +292,7 @@
     ["Where it all began", "一切的起點", "一切的起点"],
     ["First Date", "第一次約會", "第一次约会"],
     ["Level 1 unlocked", "解鎖第 1 關", "解锁第 1 关"],
+    ["The real moments behind the story", "故事背後的真實瞬間", "故事背后的真实瞬间"],
     ["Doubles Team", "雙打搭檔", "双打搭档"],
     ["Partners on and off the court", "球場內外都是搭檔", "球场内外都是搭档"],
     ["Match Point", "賽末點", "赛末点"],

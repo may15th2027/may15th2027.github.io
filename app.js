@@ -425,6 +425,7 @@
       });
       if (u > 1) {
         const li = document.createElement("li");
+        li.className = "restart-li";
         const r = document.createElement("button");
         r.type = "button"; r.className = "restart"; r.textContent = "↺ Restart this story";
         r.addEventListener("click", () => { sfx.blip(); store.set(key(), 1); justUnlocked = -1; load(0); toDialog(); });

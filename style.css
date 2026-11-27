@@ -620,7 +620,11 @@ legend { font-size: 26px; font-weight: 700; margin-bottom: 14px; padding: 0; }
 
 /* chapter picker row (under the frame) */
 .story-layout .chapters { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 4px 0; padding: 12px; }
-.story-layout .chapters li { flex: 1 1 150px; margin: 0; }
+/* every chapter box the same width and height (the restart link keeps its own size) */
+.story-layout .chapters { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.story-layout .chapters li { margin: 0; }
+.story-layout .chapters li.restart-li { align-self: center; }
+.story-layout .chapters li:not(.restart-li) button { height: 100%; }
 .story-layout .hint { margin: 14px 0 0; }
 
 /* phone: crop away the bottom of the art and put the dialogue under it */
